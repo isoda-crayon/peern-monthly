@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>療育レポート 2026年6月分｜あとりえくれよん</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --mint:#d8f3ea; --mint-d:#5bc4a4;
+    --pink:#ffe1ec; --pink-d:#f48fb1;
+    --lav:#e8e3fb; --lav-d:#a99adf;
+    --cream:#fff6e4; --cream-d:#f4c869;
+    --sky:#dcefff; --sky-d:#67c1ec;
+    --ink:#54514c; --soft:#fbf7f1; --line:#efe7df;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; color:var(--ink); line-height:1.95;
+    font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif;
+    background:
+      radial-gradient(circle at 10% 6%, #ffe9f1 0 16%, transparent 16%),
+      radial-gradient(circle at 92% 10%, #def0ff 0 14%, transparent 14%),
+      radial-gradient(circle at 88% 94%, #fff2d6 0 18%, transparent 18%),
+      radial-gradient(circle at 6% 92%, #e2f7ee 0 16%, transparent 16%),
+      #fffaf4;
+    background-attachment:fixed;
+  }
+  .wrap{max-width:840px; margin:0 auto; padding:22px 14px 90px;}
+
+  .maintitle{font-family:"Mochiy Pop One",sans-serif; color:var(--pink-d);
+    font-size:30px; text-align:center; margin:8px 0 18px; letter-spacing:2px;
+    text-shadow:0 2px 0 #fff, 0 3px 6px rgba(244,143,177,.25);}
+
+  .notice{background:#fff; border:2px dashed var(--sky-d); border-radius:20px;
+    padding:22px 22px; margin:14px 0; text-align:center; color:#5a6b73; font-size:15px; line-height:2.1;}
+  .notice .nicon{font-size:30px; display:block; margin-bottom:6px;}
+  .notice strong{color:var(--pink-d);}
+
+  .banner{display:block; width:100%; margin:10px 0 8px;
+    filter:drop-shadow(0 9px 14px rgba(150,130,170,.22)); transform:rotate(-1deg);}
+  .sec-banner{display:block; width:100%; max-width:520px; margin:36px auto 16px;
+    filter:drop-shadow(0 7px 12px rgba(150,150,170,.2));}
+  .sec-banner.tl{transform:rotate(-1.6deg);}
+  .sec-banner.tr{transform:rotate(1.6deg);}
+
+  .fb{border-radius:20px; text-align:center; font-family:"Mochiy Pop One",sans-serif;
+    color:#fff; letter-spacing:2px; position:relative; overflow:hidden;}
+  .fb.top{margin:6px 0 4px; padding:30px 16px; font-size:34px;
+    background:repeating-linear-gradient(135deg,#5bc4a4 0 22px,#67c1ec 22px 44px);
+    text-shadow:0 2px 0 rgba(0,0,0,.12);}
+  .fb.sec{max-width:520px; margin:36px auto 16px; padding:18px 16px; font-size:24px;
+    text-shadow:0 2px 0 rgba(0,0,0,.12);}
+  .fb.s1{background:linear-gradient(90deg,#67c1ec,#9ad8f3);}
+  .fb.s2{background:linear-gradient(90deg,#5bc4a4,#9fe0cd);}
+  .fb.s3{background:linear-gradient(90deg,#a99adf,#c9bff0);}
+  .fb.s4{background:linear-gradient(90deg,#f48fb1,#ffc0d5);}
+
+  .card{background:#fff; border-radius:24px; padding:20px 20px 22px; margin:14px 0;
+    box-shadow:0 8px 0 var(--line), 0 16px 26px rgba(180,170,160,.12);}
+  .cap{display:inline-block; font-family:"Mochiy Pop One",sans-serif; font-size:15px;
+    padding:5px 16px; border-radius:999px; margin-bottom:12px;}
+  .cap.mint{background:var(--mint); color:#1f7d62;}
+  .cap.pink{background:var(--pink); color:#b34a6c;}
+  .cap.lav{background:var(--lav); color:#6552a8;}
+  .cap.cream{background:var(--cream); color:#9a6e10;}
+  .cap.sky{background:var(--sky); color:#1f6f93;}
+
+  .imgslot{border:3px dashed #cdd9d4; border-radius:18px; background:
+      repeating-linear-gradient(45deg,#fbfdfc 0 12px,#f3f8f6 12px 24px);
+    min-height:150px; display:flex; align-items:center; justify-content:center;
+    color:#a9b3ae; font-size:13px; text-align:center; padding:18px;}
+
+  table{width:100%; border-collapse:separate; border-spacing:0; overflow:hidden;
+    border-radius:16px; font-size:14px;}
+  thead th{font-family:"Mochiy Pop One",sans-serif; font-weight:normal; font-size:13px;
+    color:#fff; padding:11px 12px; text-align:left;}
+  .t-mint thead th{background:var(--mint-d);}
+  .t-sky thead th{background:var(--sky-d);}
+  tbody td{padding:12px 12px; border-bottom:1px solid var(--line); background:#fff; vertical-align:top;}
+  tbody tr:nth-child(even) td{background:var(--soft);}
+  .daycell{white-space:nowrap; font-weight:500; color:#7a756e; width:84px;}
+  .blankcell{color:#cfc6bc;}
+  td .write{display:block; min-height:46px;}
+  .narrow{width:120px;}
+
+  .hint{display:block; font-size:12px; color:#a89f96; margin:6px 2px 2px;}
+  .gphoto{display:inline-flex; align-items:center; gap:8px; background:var(--mint);
+    color:#1f7d62; border-radius:999px; padding:8px 18px; font-size:14px; text-decoration:none;
+    font-weight:500;}
+
+  .lines{--lh:40px; border-radius:14px; background:repeating-linear-gradient(
+      to bottom, transparent 0 calc(var(--lh) - 2px), var(--line) calc(var(--lh) - 2px) var(--lh));}
+  .lines.l3{min-height:120px;} .lines.l5{min-height:200px;} .lines.l2{min-height:80px;}
+
+  .goal-item{display:flex; gap:12px; margin:10px 0;}
+  .num{flex:none; width:30px; height:30px; border-radius:50%; display:grid; place-items:center;
+    font-family:"Mochiy Pop One",sans-serif; font-size:14px; color:#fff;}
+  .n1{background:var(--mint-d);} .n2{background:var(--pink-d);} .n3{background:var(--lav-d);}
+  .n4{background:var(--cream-d);} .n5{background:var(--sky-d);}
+  .goal-item .lines{flex:1; min-height:64px;}
+
+  .sub{font-family:"Mochiy Pop One",sans-serif; font-size:14px; color:#7a756e; margin:16px 0 6px;}
+
+  .taskwrap{margin:14px 0;}
+  .taskpage{margin:0 0 24px;}
+  .taskpage img{display:block; width:100%; border-radius:20px;
+    filter:drop-shadow(0 8px 16px rgba(150,140,160,.22));}
+  .taskpage:nth-child(odd) img{transform:rotate(-0.8deg);}
+  .taskpage:nth-child(even) img{transform:rotate(0.8deg);}
+
+  .footer{text-align:center; margin-top:34px; font-size:13px; color:#bcb3a9;}
+  .rb{height:12px; border-radius:999px; max-width:220px; margin:0 auto 12px;
+    background:linear-gradient(90deg,var(--pink-d),var(--cream-d),var(--mint-d),var(--sky-d),var(--lav-d));}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1 class="maintitle">2026年6月分</h1>
+
+  <img class="banner" src="images/banner_top.png" alt="療育"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb top',textContent:'療育'}))" />
+
+  <img class="sec-banner tl" src="images/sec1_schedule.png" alt="① スケジュール"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb sec s1',textContent:'① スケジュール'}))" />
+
+  <figure class="taskpage"><img src="images/schedule_main.png" alt="2026年6月のメイン課題スケジュール" /></figure>
+
+  <img class="sec-banner tr" src="images/sec2_record.png" alt="② 療育記録"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb sec s2',textContent:'② 療育記録'}))" />
+
+  <section class="notice">
+    <span class="nicon">📝</span>
+    療育記録は、<strong>6月分より月次レポート</strong>としてご報告いたします。<br>
+    <strong>7月10日〜15日ごろのリリース</strong>でお伝えしますので、いましばらくお待ちください。
+  </section>
+
+  <img class="sec-banner tl" src="images/sec3_goal.png" alt="③ 今月の目標、総括"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb sec s3',textContent:'③ 今月の目標、総括'}))" />
+
+  <section class="notice">
+    <span class="nicon">🎯</span>
+    今月の目標・総括も、<strong>月次レポート</strong>としてご報告する予定です。<br>
+    <strong>7月10日〜15日ごろのリリース</strong>でお伝えしますので、いましばらくお待ちください。
+  </section>
+
+  <img class="sec-banner tr" src="images/sec4_task.png" alt="④ 課題内容"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb sec s4',textContent:'④ 課題内容'}))" />
+
+  <section class="taskwrap">
+    <figure class="taskpage"><img src="images/task1.png" alt="教科課題：ヨメルかな" /></figure>
+    <figure class="taskpage"><img src="images/task2.png" alt="瞑想課題：ボディスキャンでホッとタイム" /></figure>
+    <figure class="taskpage"><img src="images/task3.png" alt="メイン課題：イラスト（さかな）" /></figure>
+    <figure class="taskpage"><img src="images/task4.png" alt="メイン課題：ポストカード（スイーツ）" /></figure>
+    <figure class="taskpage"><img src="images/task5.png" alt="メイン課題：キャプテン・リノ" /></figure>
+    <figure class="taskpage"><img src="images/task6.png" alt="メイン課題：はたらく細胞シアター" /></figure>
+  </section>
+
+  <footer class="footer">
+    <div class="rb"></div>
+    あとりえくれよん ｜ 療育レポート 2026年6月分
+  </footer>
+
+</div>
+</body>
+</html>

@@ -17,6 +17,7 @@
     --ink:#54514c; --soft:#fbf7f1; --line:#efe7df;
   }
   *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
   body{
     margin:0; color:var(--ink); line-height:1.95;
     font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN",sans-serif;
@@ -61,22 +62,39 @@
 
   .banner{display:block; width:100%; margin:10px 0 8px;
     filter:drop-shadow(0 9px 14px rgba(150,130,170,.22)); transform:rotate(-1deg);}
-  .sec-banner{display:block; width:100%; max-width:520px; margin:36px auto 16px;
-    filter:drop-shadow(0 7px 12px rgba(150,150,170,.2));}
-  .sec-banner.tl{transform:rotate(-1.6deg);}
-  .sec-banner.tr{transform:rotate(1.6deg);}
 
   .fb{border-radius:20px; text-align:center; font-family:"Mochiy Pop One",sans-serif;
     color:#fff; letter-spacing:2px; position:relative; overflow:hidden;}
   .fb.top{margin:6px 0 4px; padding:30px 16px; font-size:34px;
     background:repeating-linear-gradient(135deg,#5bc4a4 0 22px,#67c1ec 22px 44px);
     text-shadow:0 2px 0 rgba(0,0,0,.12);}
-  .fb.sec{max-width:520px; margin:36px auto 16px; padding:18px 16px; font-size:24px;
-    text-shadow:0 2px 0 rgba(0,0,0,.12);}
-  .fb.s1{background:linear-gradient(90deg,#67c1ec,#9ad8f3);}
-  .fb.s2{background:linear-gradient(90deg,#5bc4a4,#9fe0cd);}
-  .fb.s3{background:linear-gradient(90deg,#a99adf,#c9bff0);}
-  .fb.s4{background:linear-gradient(90deg,#f48fb1,#ffc0d5);}
+
+  /* quick nav — sticky jump links for fast section access on mobile */
+  .quicknav{position:sticky; top:0; z-index:20; display:flex; gap:8px;
+    background:rgba(255,250,244,.92); -webkit-backdrop-filter:blur(6px); backdrop-filter:blur(6px);
+    padding:9px 4px; margin:2px 0 6px; border-radius:0 0 18px 18px;
+    box-shadow:0 4px 12px rgba(150,140,160,.14);}
+  .quicknav a{flex:1; text-align:center; text-decoration:none; font-size:12.5px;
+    font-family:"Mochiy Pop One",sans-serif; color:#7a6f63; background:#fff;
+    border:1.5px solid var(--line); border-radius:999px; padding:10px 6px;
+    transition:.15s ease;}
+  .quicknav a:active{transform:scale(.95); background:var(--soft);}
+
+  /* section heads — replaces the old banner images with a lightweight HTML/CSS header */
+  .section-head{display:flex; align-items:center; gap:12px; max-width:560px;
+    margin:42px auto 16px; padding:0 2px; scroll-margin-top:62px;}
+  .section-head .ico{flex:0 0 auto; width:46px; height:46px; border-radius:15px;
+    display:flex; align-items:center; justify-content:center; font-size:22px;
+    color:#fff; box-shadow:0 5px 12px rgba(0,0,0,.14);}
+  .section-head .ico.i-sch{background:linear-gradient(135deg,#67c1ec,#5bc4a4);}
+  .section-head .ico.i-task{background:linear-gradient(135deg,#f48fb1,#f4c869);}
+  .section-head .head-text{min-width:0;}
+  .section-head h2{font-family:"Mochiy Pop One",sans-serif; font-size:19px; margin:0;
+    letter-spacing:1px; color:#54514c; line-height:1.3;}
+  .section-head .sub{display:block; font-size:11.5px; color:#a79e93; margin-top:2px;
+    letter-spacing:.3px;}
+  .section-head::after{content:""; flex:1; height:2px; margin-left:4px; align-self:center;
+    background:repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 13px);}
 
   .taskwrap{margin:14px 0;}
   .taskpage{margin:0 0 24px;}
@@ -103,21 +121,36 @@
   <img class="banner" src="images/banner_top.png" alt="療育"
        onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb top',textContent:'療育'}))" />
 
-  <img class="sec-banner tl" src="images/sec1_schedule.png" alt="① スケジュール"
-       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb sec s1',textContent:'① スケジュール'}))" />
+  <nav class="quicknav">
+    <a href="#schedule">📅 スケジュール</a>
+    <a href="#tasks">🎨 課題内容</a>
+  </nav>
 
-  <figure class="taskpage"><img src="images/schedule_main.png" alt="2026年7月のメイン課題スケジュール" /></figure>
+  <div class="section-head" id="schedule">
+    <span class="ico i-sch">📅</span>
+    <div class="head-text">
+      <h2>スケジュール</h2>
+      <span class="sub">2026年7月のメイン課題予定</span>
+    </div>
+  </div>
 
-  <img class="sec-banner tr" src="images/sec4_task.png" alt="課題内容"
-       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'fb sec s4',textContent:'課題内容'}))" />
+  <figure class="taskpage"><img src="images/schedule_main.png" alt="2026年7月のメイン課題スケジュール" loading="lazy" /></figure>
+
+  <div class="section-head" id="tasks">
+    <span class="ico i-task">🎨</span>
+    <div class="head-text">
+      <h2>課題内容</h2>
+      <span class="sub">今月取り組んだ療育プログラム</span>
+    </div>
+  </div>
 
   <section class="taskwrap">
-    <figure class="taskpage"><img src="images/task1.png" alt="教科課題（あしざん）" /></figure>
-    <figure class="taskpage"><img src="images/task2.png" alt="瞑想課題（ふきあげパイプでホッとタイム）" /></figure>
-    <figure class="taskpage"><img src="images/task3.png" alt="メイン課題①（ゴムバンド）" /></figure>
-    <figure class="taskpage"><img src="images/task4.png" alt="メイン課題②（マグネット）" /></figure>
-    <figure class="taskpage"><img src="images/task5.png" alt="メイン課題③（衣類のお片付け／Tシャツたたみリレー）" /></figure>
-    <figure class="taskpage"><img src="images/task6.png" alt="メイン課題④（衣類のお片付け／衣類たたみリレー）" /></figure>
+    <figure class="taskpage"><img src="images/task1.png" alt="教科課題（あしざん）" loading="lazy" /></figure>
+    <figure class="taskpage"><img src="images/task2.png" alt="瞑想課題（ふきあげパイプでホッとタイム）" loading="lazy" /></figure>
+    <figure class="taskpage"><img src="images/task3.png" alt="メイン課題①（ゴムバンド）" loading="lazy" /></figure>
+    <figure class="taskpage"><img src="images/task4.png" alt="メイン課題②（マグネット）" loading="lazy" /></figure>
+    <figure class="taskpage"><img src="images/task5.png" alt="メイン課題③（衣類のお片付け／Tシャツたたみリレー）" loading="lazy" /></figure>
+    <figure class="taskpage"><img src="images/task6.png" alt="メイン課題④（衣類のお片付け／衣類たたみリレー）" loading="lazy" /></figure>
   </section>
 
   <footer class="footer">

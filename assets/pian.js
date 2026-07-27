@@ -66,8 +66,8 @@
 
   function pageHTML(p) {
     var alt = p.sub ? p.sub + "　" + p.title : p.title;
-    /* crop 指定のあるページは、余白の多い下側を隠して縦を詰める。
-       開けば全体が見えるので、情報が失われるわけではない。 */
+    /* crop 指定のあるページは、下側の余白を隠して縦を詰める。
+       隠れた分は見る手段が無くなるので、余白だけのページにしか使わない。 */
     var cropped = p.crop && p.crop > 0 && p.crop < 1;
     var style = cropped ? ' style="--ar:' + (p.w / (p.h * p.crop)).toFixed(4) + '"' : "";
     return '' +
@@ -76,12 +76,10 @@
           (p.sub ? '<span class="wk">' + esc(p.sub) + "</span>" : "") +
           '<span class="ttl">' + esc(p.title) + "</span>" +
         "</figcaption>" +
-        '<a class="page-link' + (cropped ? " is-crop" : "") + '" href="' + esc(p.src) + '" ' +
-           'target="_blank" rel="noopener" aria-label="' + esc(alt) + ' を大きく開く"' + style + ">" +
+        '<div class="page-view' + (cropped ? " is-crop" : "") + '"' + style + ">" +
           '<img src="' + esc(p.src) + '" width="' + p.w + '" height="' + p.h + '" ' +
                'loading="lazy" decoding="async" alt="' + esc(alt) + '">' +
-          '<span class="zoom">🔍 ' + (cropped ? "タップで全体を見る" : "タップで大きく") + "</span>" +
-        "</a>" +
+        "</div>" +
       "</figure>";
   }
 
@@ -106,11 +104,9 @@
     if (c["catch"]) html += '<p class="hero-catch">' + esc(c["catch"]) + "</p>";
     if (cover) {
       html += '<figure class="cover">' +
-        '<a href="' + esc(cover.src) + '" target="_blank" rel="noopener" ' +
-           'aria-label="' + esc(issue.label) + 'の表紙を大きく開く">' +
         '<img src="' + esc(cover.src) + '" width="' + cover.w + '" height="' + cover.h + '" ' +
              'decoding="async" alt="' + esc(issue.label) + "　" + esc(brand.name) + 'の表紙">' +
-        "</a></figure>";
+        "</figure>";
     }
     if (c.note) {
       html += '<p class="hero-note"><span class="ico">📌</span><span>' + esc(c.note) + "</span></p>";

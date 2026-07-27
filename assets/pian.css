@@ -232,7 +232,6 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 
 /* 表紙画像 */
 .cover{margin:20px 0 0;}
-.cover a{display:block; border-radius:18px;}
 .cover img{
   display:block; width:100%; height:auto; border-radius:18px;
   box-shadow:var(--shadow-m);
@@ -315,31 +314,20 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
   font-family:var(--font-head); font-size:15.5px; color:var(--ink);
   line-height:1.4;
 }
-.page-link{
-  display:block; position:relative; border-radius:var(--radius);
-  text-decoration:none;
+.page-view{
+  display:block; border-radius:var(--radius);
 }
-.page-link img{
+.page-view img{
   display:block; width:100%; height:auto; border-radius:var(--radius);
   background:var(--card);
   box-shadow:var(--shadow-m);
 }
-/* 下が余白のページは、一覧では上だけ見せて縦を詰める */
-.page-link.is-crop{overflow:hidden;}
-.page-link.is-crop img{
+/* 下が余白のページは上だけ見せて縦を詰める（余白だけのページに限る） */
+.page-view.is-crop{overflow:hidden;}
+.page-view.is-crop img{
   aspect-ratio:var(--ar);
   height:auto; object-fit:cover; object-position:top center;
 }
-.page-link .zoom{
-  position:absolute; right:10px; bottom:10px;
-  display:inline-flex; align-items:center; gap:4px;
-  padding:7px 12px; border-radius:999px;
-  font-size:11.5px; color:var(--ink-2);
-  background:rgba(255,255,255,.92);
-  box-shadow:0 2px 8px rgba(90,80,70,.18);
-  pointer-events:none;
-}
-.page-link:active img{transform:scale(.995);}
 
 /* ══════════ バックナンバー ══════════ */
 .archive{
@@ -479,19 +467,18 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 }
 @media (prefers-contrast:more){
   :root{--ink:#241f1b; --ink-2:#4d453d; --ink-3:#6a6158; --line:#c9bcab;}
-  .page-link .zoom{background:#fff; color:#241f1b;}
 }
 
 /* ══════════ 印刷 ══════════ */
 @media print{
   body{background:#fff;}
-  body::before,.site,.issuebar,.jump,.archive,.tools,.totop,.skip,.zoom{display:none !important;}
+  body::before,.site,.issuebar,.jump,.archive,.tools,.totop,.skip{display:none !important;}
   .wrap{max-width:none; padding:0;}
   .issue,.issue .sec{animation:none;}
   .page{margin:0 0 10mm; break-inside:avoid;}
-  .page-link.is-crop{overflow:visible;}
-  .page-link.is-crop img{aspect-ratio:auto; object-fit:fill;} /* 紙では省略せず全体を出す */
-  .page-link img{box-shadow:none; border-radius:0; transform:none;}
+  .page-view.is-crop{overflow:visible;}
+  .page-view.is-crop img{aspect-ratio:auto; object-fit:fill;} /* 紙では省略せず全体を出す */
+  .page-view img{box-shadow:none; border-radius:0; transform:none;}
   .cover img{box-shadow:none; transform:none;}
   .sec-head .ico{box-shadow:none;}
 }

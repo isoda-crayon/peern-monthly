@@ -10,6 +10,9 @@
 <meta property="og:description" content="今月の課題とスケジュール、これまでの号もまとめて見られます。" />
 <title>月刊ぴあん｜にじいろくれよん</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖍</text></svg>" />
+<link rel="manifest" href="manifest-nijiiro.webmanifest" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="月刊ぴあん" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -18,6 +21,7 @@
 <body data-brand="nijiiro">
 
 <a class="skip" href="#main">本文へすすむ</a>
+<div class="progress" id="readProgress" aria-hidden="true"></div>
 
 <header class="site">
   <div class="wrap">
@@ -31,17 +35,6 @@
     </nav>
   </div>
 </header>
-
-<div class="issuebar">
-  <div class="wrap">
-    <p class="nowlabel">
-      <span class="pin" aria-hidden="true"></span>
-      <b id="nowIssue" aria-live="polite">読み込み中…</b>
-      <span class="sub">いま見ている号</span>
-    </p>
-    <a class="btn-arch" href="#archive">📚 ほかの号</a>
-  </div>
-</div>
 
 <main id="main" class="wrap">
 
@@ -72,10 +65,40 @@
 <footer class="foot wrap">
   <div class="rainbow" aria-hidden="true"></div>
   月刊ぴあん ｜ にじいろくれよん<br />
-  <small>ページの画像は指を広げると大きく見られます</small>
+  <small>ページはタップでよむ画面がひらきます ・ ひろげる指で拡大できます</small>
 </footer>
 
 <button class="totop" id="toTop" type="button">↑ うえへ</button>
+
+<nav class="dock" id="dock" hidden aria-label="号とセクションのいどう">
+  <button type="button" class="dock-issue" id="dockIssue">📚 号をえらぶ</button>
+  <div class="dock-tabs" id="dockTabs"></div>
+</nav>
+
+<dialog class="sheet" id="issueSheet" aria-labelledby="sheetTitle">
+  <div class="sheet-body">
+    <div class="sheet-grip" aria-hidden="true"></div>
+    <h2 id="sheetTitle">📚 号をえらぶ</h2>
+    <p class="sheet-lead">見たい月を タップしてください</p>
+    <div class="sheet-grid" id="sheetGrid"></div>
+  </div>
+</dialog>
+
+<dialog class="viewer" id="viewer" aria-label="ページをよむ">
+  <div class="v-top">
+    <div class="v-title" id="vTitle"></div>
+    <button type="button" class="v-close" id="vClose">✕ とじる</button>
+  </div>
+  <div class="v-stage" id="vStage">
+    <div class="v-track" id="vTrack"></div>
+  </div>
+  <div class="v-bottom">
+    <button type="button" class="v-nav" id="vPrev" aria-label="まえのページ">◀</button>
+    <div class="v-pos" id="vPos" aria-live="polite"></div>
+    <button type="button" class="v-nav" id="vNext" aria-label="つぎのページ">▶</button>
+  </div>
+  <div class="v-hint" id="vHint" hidden>👈 スワイプで ページおくり ・ ピンチで かくだい</div>
+</dialog>
 
 <script src="issues.js"></script>
 <script src="assets/pian.js"></script>

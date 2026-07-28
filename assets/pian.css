@@ -29,6 +29,7 @@
   --c-subject:var(--m-blue);
   --c-meditation:var(--m-indigo);
   --c-main:var(--m-orange);
+  --c-other:#d8ae3c;   /* 旧フォーマット（1枚に複数課題）の号 */
 
   --radius:16px;
   --dock-h:62px;
@@ -255,6 +256,8 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 .sec[data-sec="subject"] .sec-head{color:var(--c-subject);}
 .sec[data-sec="meditation"] .sec-head{color:var(--c-meditation);}
 .sec[data-sec="main"] .sec-head{color:var(--c-main);}
+.sec[data-sec="other"] .sec-head{color:var(--c-other);}
+.sec[data-sec="other"] .sec-head .ico{background:var(--c-other);}
 .sec[data-sec="schedule"] .sec-head .ico{background:var(--c-schedule);}
 .sec[data-sec="subject"] .sec-head .ico{background:var(--c-subject);}
 .sec[data-sec="meditation"] .sec-head .ico{background:var(--c-meditation);}
@@ -275,6 +278,7 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 .sec[data-sec="subject"] .wk{background:var(--c-subject);}
 .sec[data-sec="meditation"] .wk{background:var(--c-meditation);}
 .sec[data-sec="main"] .wk{background:var(--c-main);}
+.sec[data-sec="other"] .wk{background:var(--c-other);}
 .page-cap .ttl{
   font-family:var(--font-head); font-size:15.5px; color:var(--ink);
   line-height:1.4;
@@ -468,6 +472,7 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 .dock-tab[data-sec="subject"][aria-current="true"]{background:#e3f0fa; border-color:var(--c-subject);}
 .dock-tab[data-sec="meditation"][aria-current="true"]{background:#eceafa; border-color:var(--c-meditation);}
 .dock-tab[data-sec="main"][aria-current="true"]{background:#fdeeda; border-color:var(--c-main);}
+.dock-tab[data-sec="other"][aria-current="true"]{background:#fbf1d6; border-color:var(--c-other);}
 
 /* ══════════ 号えらびシート（下からせり上がる） ══════════ */
 .sheet{

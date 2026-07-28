@@ -24,9 +24,11 @@
     schedule:   { icon: "📅", name: "スケジュール",   short: "よてい",   lead: "1か月のよてい",           color: "#76c69f" },
     subject:    { icon: "✏️", name: "きょうかかだい", short: "きょうか", lead: "べんきょうの課題",         color: "#6bb2dd" },
     meditation: { icon: "🧘", name: "めいそうかだい", short: "めいそう", lead: "こころを落ちつける時間",   color: "#8e84cf" },
-    main:       { icon: "🎨", name: "メインかだい",   short: "メイン",   lead: "週ごとの活動",             color: "#f0a259" }
+    main:       { icon: "🎨", name: "メインかだい",   short: "メイン",   lead: "週ごとの活動",             color: "#f0a259" },
+    /* 2026年3月以前の号は1枚に複数の課題がまとまっているので、まとめて出す */
+    other:      { icon: "📄", name: "この月のないよう", short: "ないよう", lead: "課題とよていのまとめ",   color: "#d8ae3c" }
   };
-  var SEC_ORDER = ["schedule", "subject", "meditation", "main"];
+  var SEC_ORDER = ["schedule", "subject", "meditation", "main", "other"];
 
   function $(id) { return document.getElementById(id); }
   var root = $("issueRoot"), archRoot = $("archList");

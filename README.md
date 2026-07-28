@@ -11,23 +11,45 @@
 
 ---
 
+## 原本PDFの置き場所
+
+共有ドライブのここが原本の保管場所です。変換スクリプトはここを見にいきます。
+
+```
+G:\共有ドライブ\あとりえくれよんＺ\②　ぴあん課題\⓪　全体\⑤　ぴあんチラシ
+```
+
+ファイル名はこの形にしてください（スクリプトがこの名前で探します）。
+
+```
+あとりえチラシ_2026年09月.pdf
+にじいろチラシ_2026年09月.pdf
+```
+
 ## 毎月やること（新しい号を足す）
 
 ### 1. PDFをページ画像に変換する
 
-「月刊ぴあんメーカー」から書き出したPDFを、事業所ごとに1回ずつ変換します。
+原本を上の場所に置いたら、**月を指定するだけ**で両事業所ぶんまとめて変換できます。
 
 ```bash
-python tools/add_issue.py --pdf "C:\Users\...\月刊ぴあんメーカー　あとりえ.pdf" --brand atelier --ym 2026-09
-python tools/add_issue.py --pdf "C:\Users\...\月刊ぴあんメーカー　にじいろ.pdf" --brand nijiiro --ym 2026-09
+python tools/add_issue.py --ym 2026-09
 ```
 
 - `--ym` は「年-月」（2026年9月号なら `2026-09`）
-- 画像は `images/2026-09/atelier/p1.webp …` に作られます
+- 画像は `images/2026-09/atelier/p1.webp …` と `nijiiro/…` に作られます
 - バックナンバー一覧に出す小さい見本（`thumb.webp`）も一緒に作られます
 - 実行すると、次の手順でそのまま使える情報（ファイル名・幅・高さ）が表示されます
 
+片方だけ・別の場所のPDFを使いたいときは：
+
+```bash
+python tools/add_issue.py --ym 2026-09 --brand nijiiro
+python tools/add_issue.py --ym 2026-09 --brand nijiiro --pdf "C:\Users\...\別のファイル.pdf"
+```
+
 必要なもの: [poppler](https://github.com/oschwartz10612/poppler-windows)（`pdftoppm`）と Python の Pillow。
+共有ドライブが `G:` にマウントされていないPCで作業するときは `--pdf` で直接指定してください。
 
 ### 2. `issues.js` に1件足す
 

@@ -26,7 +26,7 @@
     meditation: { icon: "🧘", name: "めいそうかだい", short: "めいそう", lead: "こころを落ちつける時間",   color: "#8e84cf" },
     main:       { icon: "🎨", name: "メインかだい",   short: "メイン",   lead: "週ごとの活動",             color: "#f0a259" },
     /* 2026年3月以前の号は1枚に複数の課題がまとまっているので、まとめて出す */
-    other:      { icon: "📄", name: "この月のないよう", short: "ないよう", lead: "課題とよていのまとめ",   color: "#d8ae3c" }
+    other:      { icon: "📄", name: "この月のないよう", short: "ないよう", lead: "1枚に何こかの課題がのっています", color: "#d8ae3c" }
   };
   var SEC_ORDER = ["schedule", "subject", "meditation", "main", "other"];
 
@@ -80,7 +80,10 @@
     return cover || c.pages.filter(function (p) { return p.sec === "schedule"; })[0] || c.pages[0];
   }
   function summaryOf(issue) {
-    return pagesOf(issue, "main").map(function (p) { return p.title; }).join("・");
+    var main = pagesOf(issue, "main");
+    /* 以前の形式（1枚に複数課題）の号は main が無いので、まとめページの見出しを使う */
+    if (!main.length) main = pagesOf(issue, "other");
+    return main.map(function (p) { return p.title; }).join("・");
   }
 
   /* ══════════ レンダラー ══════════ */
@@ -109,8 +112,14 @@
   function issueHTML(issue) {
     var c = content(issue);
     if (!c) {
-      return '<p class="hero-note" style="margin:28px auto;"><span class="ico">🙇</span>' +
-        "この号の" + esc(brand.name) + "分は、まだ用意ができていません。</p>";
+      var alt = otherBrandOf(issue);
+      return '<p class="hero-note" style="margin:28px auto;"><span class="ico">📎</span><span>' +
+        esc(issue.label) + "は、" +
+        (alt
+          ? esc(alt.name) + 'だけの発行です。<br><a href="' + esc(alt.href) + "#" + issue.id + '">▶ ' +
+            esc(alt.name) + "のこの号を見る</a>"
+          : "まだ用意ができていません。") +
+        "</span></p>";
     }
     var flat = c.pages;
     var cover = flat.filter(function (p) { return p.sec === "cover"; })[0];
@@ -155,11 +164,21 @@
     return html;
   }
 
+  /** その号を出しているもう一方の事業所（無ければ null） */
+  function otherBrandOf(issue) {
+    var keys = Object.keys(issue.brands || {});
+    for (var i = 0; i < keys.length; i++) {
+      if (keys[i] !== brandKey && PIAN.brands[keys[i]]) return PIAN.brands[keys[i]];
+    }
+    return null;
+  }
+
   function cardHTML(issue, currentId) {
     var thumb = thumbOf(issue);
     var isNow = issue.id === currentId;
     var items = summaryOf(issue);
     var has = !!content(issue);
+    var alt = has ? null : otherBrandOf(issue);
     return '' +
       '<a class="arch-card" href="#' + issue.id + '" data-issue="' + issue.id + '"' +
          (isNow ? ' aria-current="true"' : "") + ">" +
@@ -177,13 +196,26 @@
           (has
             ? '<span class="arch-items">' + esc(items) + "</span>" +
               '<span class="arch-go">' + (isNow ? "ひらいています" : "▶ この号を見る") + "</span>"
-            : '<span class="arch-items">準備中です</span>') +
+            : alt
+              ? '<span class="arch-items">この号は' + esc(alt.name) + "だけの発行です</span>" +
+                '<span class="arch-go">▶ ' + esc(alt.name) + "で見る</span>"
+              : '<span class="arch-items">準備中です</span>') +
         "</span>" +
       "</a>";
   }
 
+  /** 号が増えても探しやすいよう、年ごとに区切って並べる */
   function archiveHTML(currentId) {
-    return PIAN.issues.map(function (i) { return cardHTML(i, currentId); }).join("");
+    var html = "", year = null;
+    PIAN.issues.forEach(function (i) {
+      if (i.year !== year) {
+        year = i.year;
+        var n = PIAN.issues.filter(function (x) { return x.year === year; }).length;
+        html += '<p class="arch-year"><b>' + year + "年</b><span>" + n + "冊</span></p>";
+      }
+      html += cardHTML(i, currentId);
+    });
+    return html;
   }
 
   function dockHTML(issue) {

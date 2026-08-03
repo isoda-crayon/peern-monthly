@@ -411,13 +411,27 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
   display:flex; gap:10px; flex-wrap:wrap; justify-content:center;
   margin:30px 0 0;
 }
-.tools button{
+.tools button,
+.tools .tool-link{
+  display:inline-flex; align-items:center; justify-content:center;
   min-height:46px; padding:0 20px; cursor:pointer;
   font-family:var(--font-head); font-size:13.5px; color:var(--ink-2);
+  text-decoration:none;
   background:var(--card); border:2px dashed var(--line); border-radius:999px;
   transition:border-color .2s ease-out, color .2s ease-out;
 }
-.tools button:hover{border-color:var(--brand); color:var(--brand-d);}
+.tools button:hover,
+.tools .tool-link:hover{border-color:var(--brand); color:var(--brand-d);}
+
+/* 開発日誌（この ページの あゆみ）への入口。
+   赤い点は「前に見たときより新しい記事があります」の印で、
+   diary.js の latest と localStorage を見て assets/pian.js が付けます。 */
+.tools .tool-link{position:relative;}
+.tools .tool-link .dot{
+  position:absolute; top:-4px; right:-4px;
+  width:13px; height:13px; border-radius:50%;
+  background:var(--m-red); border:2px solid var(--paper);
+}
 
 .totop{
   position:fixed; right:12px;

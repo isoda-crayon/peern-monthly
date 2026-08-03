@@ -1,10 +1,11 @@
 /* 月刊ぴあん — Service Worker
  *
  * ねらい:
- *  - 号のページ画像（images/YYYY-MM/…）は一度見たら端末に残す（内容が変わらないファイルなので安全）
+ *  - 号のページ画像（images/YYYY-MM/…）と日誌の写真（images/diary/…）は一度見たら
+ *    端末に残す（内容が変わらないファイルなので安全）
  *    → 2回目からは通信なしでパッと出る。オフラインでも過去に見た号は読める
- *  - HTML / CSS / JS / issues.js は毎回ネットワーク優先
- *    → 新しい号を出したらすぐ全員に届く（キャッシュで古いまま、を防ぐ）
+ *  - HTML / CSS / JS / issues.js / diary.js は毎回ネットワーク優先
+ *    → 新しい号や日誌の記事を出したらすぐ全員に届く（キャッシュで古いまま、を防ぐ）
  */
 var VER = "pian-v1";
 
@@ -33,10 +34,11 @@ self.addEventListener("fetch", function (e) {
   var url = new URL(req.url);
   if (url.origin !== location.origin) return; // フォントなど外部はそのまま
 
-  var isIssueImage = /\/images\/\d{4}-\d{2}\//.test(url.pathname);
+  // 号の画像（images/2026-08/…）と日誌の写真（images/diary/…）。どちらも差し替えない前提
+  var isStaticImage = /\/images\/(\d{4}-\d{2}|diary)\//.test(url.pathname);
 
-  if (isIssueImage) {
-    // 号の画像: キャッシュ優先（不変ファイル）
+  if (isStaticImage) {
+    // キャッシュ優先（不変ファイル）
     e.respondWith(
       caches.open(VER).then(function (c) {
         return c.match(req).then(function (hit) {

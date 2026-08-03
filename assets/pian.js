@@ -743,6 +743,37 @@
     });
   }
 
+  /* ══════════ 開発日誌の「新しい記事あり」 ══════════ */
+
+  /* 前に日誌を読んだときより新しい更新があれば、入口に赤い点を出す。
+     最終更新日は diary.js の latest、読んだ印は日誌側（assets/diary.js）が
+     同じキーに書き込むので、一度ひらけば消えます。 */
+  function diaryDot() {
+    var link = $("diaryLink");
+    var latest = window.PIAN_DIARY && window.PIAN_DIARY.latest;
+    if (!link || !latest) return;
+    var seen = null;
+    try { seen = window.localStorage.getItem("pianDiaryLastSeen"); } catch (e) { /* 読めない＝まだ読んでいない扱い */ }
+    var fresh = !seen || seen < latest;
+    var dot = link.querySelector(".dot");
+    if (fresh && !dot) {
+      dot = document.createElement("span");
+      dot.className = "dot";
+      dot.setAttribute("aria-hidden", "true");
+      link.appendChild(dot);
+      link.setAttribute("aria-label", "この ページの あゆみ（新しい記事が あります）");
+    } else if (!fresh && dot) {
+      link.removeChild(dot);
+      link.removeAttribute("aria-label");
+    }
+  }
+  diaryDot();
+
+  /* 日誌を読んで「もどる」で帰ってきたとき、ブラウザがページを読み直さず
+     そのまま復元することがある（bfcache）。そのままだと読んだのに赤い点が
+     残るので、復元されたときにも判定し直す。 */
+  window.addEventListener("pageshow", diaryDot);
+
   /* ══════════ 起動 ══════════ */
 
   dock.hidden = false;

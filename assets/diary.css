@@ -1,0 +1,1018 @@
+/* 開発日誌ページ専用スタイル（.dd- プレフィックス）
+   にじいろクレヨン・デザインシステム準拠。送迎日誌（logbook.css）の続きとして読めるよう、
+   クラフト紙のウォームトーンとマステ色を共有している。
+   - しくみ = あいいろ / つかいかた = みどり / 軌跡 = だいだい
+   - 本文は 16.5px・行間 1.95・1行 30〜38文字。長文を読ませるための設定なので下げないこと
+   ⚠ .lb- （送迎日誌）とはクラス名を共有していない。あちらを直してもここは変わらない */
+
+.dd-root {
+  --dd-paper: #faf8f5;
+  --dd-cream: #f3ede4;
+  --dd-card: #fffefc;
+  --dd-ink: #3d3530;
+  --dd-ink-2: #6f6459;
+  --dd-ink-3: #a89f94;
+  --dd-line: #e4ded4;
+  --dd-line-2: #d5cdc1;
+
+  --dd-violet: #6d5fb8;
+  --dd-violet-bg: #efedf9;
+  --dd-green: #2e8f63;
+  --dd-green-bg: #e7f4ed;
+  --dd-orange: #b96a24;
+  --dd-orange-bg: #fbeee0;
+  --dd-yellow: #f5d76e;
+  --dd-rose: #b4576b;
+  --dd-rose-bg: #fbebee;
+
+  /* 空振り（うまくいかなかった試み）用。既存マステ5色と同じ彩度明度帯 */
+  --dd-maste-gray: #c9c2b8;
+  --dd-gray: #78716c;
+  --dd-gray-bg: #f6f4f1;
+  --dd-gray-soft: #e4dfd8;
+  /* 綴じ穴・レールの罫 */
+  --dd-rail: #ddd5ca;
+  /* 図版の台紙。白いUIキャプチャがクリーム地に溶けるのを防ぐ */
+  --dd-mat: #efe8de;
+  --dd-mat-line: #dfd6c8;
+
+  color: var(--dd-ink);
+  /* 書体は layout.tsx（next/font）で自ホストしたものを使う。読み込めない環境では
+     OS の標準に落ちる。見出しだけ丸ゴシックにして、本文は素直な角ゴシックにする */
+  font-family: var(--dd-font-body), system-ui, -apple-system, "Hiragino Sans",
+    "Noto Sans JP", sans-serif;
+  font-feature-settings: "palt" 1;
+  /* 既存の使い方ガイド3枚と同じ地。ライト専用（既存ガイドにも dark 指定はない）だが、
+     Android/iPad の強制ダーク反転だけは止める */
+  color-scheme: light;
+  background: #f3ede4;
+  background-image:
+    radial-gradient(circle at 12% 8%, #fff6e9 0, transparent 38%),
+    radial-gradient(circle at 88% 0%, #eef5ff 0, transparent 32%);
+  margin: -1rem;
+  padding: 0 1rem 5rem;
+  min-height: calc(100vh - 7rem);
+}
+
+/* ===== ページ見出し ===== */
+.dd-masthead {
+  max-width: 1180px;
+  margin: 0 auto 1.5rem;
+  padding: 1.25rem 0 1rem;
+  border-bottom: 2px solid var(--dd-ink);
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.dd-masthead h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  font-family: var(--dd-font-round), var(--dd-font-body), system-ui, sans-serif;
+}
+/* 見出しだけ丸ゴシック。使い方ガイド3枚と同じ組み方 */
+.dd-post h2,
+.dd-h,
+.dd-now-h,
+.dd-tape {
+  font-family: var(--dd-font-round), var(--dd-font-body), system-ui, sans-serif;
+}
+.dd-masthead .dd-sub {
+  margin: 0.35rem 0 0;
+  font-size: 0.875rem;
+  color: var(--dd-ink-2);
+  line-height: 1.7;
+  max-width: 46rem;
+}
+.dd-masthead-meta {
+  margin-left: auto;
+  text-align: right;
+  font-size: 0.75rem;
+  color: var(--dd-ink-3);
+  line-height: 1.8;
+  white-space: nowrap;
+}
+
+/* ===== 2カラム（目次 / 本文） ===== */
+.dd-layout {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr);
+  gap: 2.5rem;
+  align-items: start;
+}
+@media (max-width: 1080px) {
+  .dd-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
+}
+
+/* ===== 目次 ===== */
+.dd-toc {
+  position: sticky;
+  top: 5.5rem;
+  font-size: 0.8125rem;
+}
+@media (max-width: 1080px) {
+  .dd-toc {
+    position: static;
+    background: var(--dd-card);
+    border: 1px solid var(--dd-line);
+    border-radius: 12px;
+    padding: 0.875rem 1rem;
+  }
+}
+.dd-toc-h {
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  color: var(--dd-ink-3);
+  margin: 0 0 0.625rem;
+  text-transform: uppercase;
+}
+.dd-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+.dd-toc-item {
+  display: block;
+  padding: 0.4375rem 0.625rem;
+  border-radius: 8px;
+  color: var(--dd-ink-2);
+  text-decoration: none;
+  line-height: 1.5;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.dd-toc-item:hover {
+  background: var(--dd-cream);
+  color: var(--dd-ink);
+}
+.dd-toc-item.is-active {
+  background: var(--dd-card);
+  color: var(--dd-ink);
+  font-weight: 700;
+  border-left-color: var(--dd-violet);
+  box-shadow: 0 1px 3px rgb(61 53 48 / 8%);
+}
+.dd-toc-date {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--dd-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.dd-toc-sub {
+  list-style: none;
+  margin: 0.125rem 0 0.375rem;
+  padding: 0 0 0 0.875rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.0625rem;
+}
+.dd-toc-sub a {
+  display: block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  color: var(--dd-ink-2);
+  text-decoration: none;
+  border-radius: 6px;
+  line-height: 1.4;
+}
+.dd-toc-sub a:hover {
+  background: var(--dd-cream);
+  color: var(--dd-ink);
+}
+
+/* ===== 記事カード ===== */
+.dd-post {
+  background: var(--dd-card);
+  border: 1px solid var(--dd-line);
+  border-radius: 14px;
+  padding: 1.75rem 2rem 2rem;
+  margin-bottom: 2rem;
+  scroll-margin-top: 5rem;
+  box-shadow: 0 1px 2px rgb(61 53 48 / 4%);
+}
+@media (max-width: 720px) {
+  .dd-post {
+    padding: 1.25rem 1rem 1.5rem;
+    border-radius: 12px;
+  }
+}
+
+/* マスキングテープ風のカテゴリ見出し */
+.dd-tape {
+  display: inline-block;
+  padding: 0.3125rem 0.9375rem 0.3125rem 0.875rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  transform: rotate(-1.2deg);
+  margin: 0 0 0.875rem -0.375rem;
+  box-shadow: 1px 1px 0 rgb(61 53 48 / 6%);
+}
+/* マステの文字は濃いインク色にする。既存3ガイドは白文字だが、実測コントラストが
+   #6BAEDB 上で 2.41、#7EC8A0 上で 1.97、#F5D76E 上で 1.42 と AA(4.5:1) を全色下回る。
+   #3D3530 なら順に 4.97 / 6.09 / 8.47 と全色通過する。**色は1つも変えていない**ので
+   「同じシステムに見えるか」は損なわれない。既存3ガイドとの意図的な差分。 */
+.dd-tape { color: var(--dd-ink); }
+.dd-tape[data-cat="しくみ"] { background: #6baedb; }
+.dd-tape[data-cat="つかいかた"] { background: #7ec8a0; }
+.dd-tape[data-cat="軌跡"] { background: #f5d76e; }
+
+.dd-post-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+.dd-post h2 {
+  margin: 0;
+  font-size: 1.4375rem;
+  font-weight: 900;
+  line-height: 1.42;
+  letter-spacing: 0.005em;
+}
+@media (max-width: 720px) {
+  .dd-post h2 { font-size: 1.1875rem; }
+}
+.dd-date {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--dd-ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dd-post-lead {
+  margin: 0.75rem 0 1.25rem;
+  font-size: 1rem;
+  line-height: 1.9;
+  color: var(--dd-ink-2);
+  padding-left: 0.875rem;
+  border-left: 3px solid var(--dd-line-2);
+}
+.dd-tags {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin: 0 0 1.25rem;
+}
+.dd-tag {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--dd-ink-2);
+  background: var(--dd-cream);
+  border: 1px solid var(--dd-line);
+  border-radius: 999px;
+  padding: 0.125rem 0.5625rem;
+}
+
+/* ===== 本文ブロック ===== */
+.dd-body { font-size: 1.03125rem; line-height: 1.95; }
+.dd-body > * + * { margin-top: 1.125rem; }
+.dd-body p { margin: 0; }
+.dd-body strong { font-weight: 800; background: linear-gradient(transparent 62%, #f7e9a8 62%); }
+
+.dd-lead-block {
+  font-size: 1.09375rem;
+  line-height: 1.95;
+  background: var(--dd-cream);
+  border-radius: 12px;
+  padding: 1.125rem 1.25rem;
+}
+
+.dd-h {
+  font-size: 1.125rem;
+  font-weight: 900;
+  margin-top: 2.25rem !important;
+  padding-bottom: 0.4375rem;
+  border-bottom: 2px solid var(--dd-ink);
+  scroll-margin-top: 5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.dd-h::before {
+  content: "";
+  width: 0.5rem;
+  height: 1.0625rem;
+  background: var(--dd-yellow);
+  flex: none;
+}
+
+.dd-ul { margin: 0; padding-left: 0; list-style: none; }
+.dd-ul li {
+  position: relative;
+  padding-left: 1.375rem;
+  margin-top: 0.5rem;
+}
+.dd-ul li::before {
+  content: "";
+  position: absolute;
+  left: 0.3125rem;
+  top: 0.8125rem;
+  width: 0.375rem;
+  height: 0.375rem;
+  border-radius: 50%;
+  background: var(--dd-ink-3);
+}
+
+/* before → after */
+.dd-ba {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 0.875rem;
+  align-items: stretch;
+}
+@media (max-width: 720px) {
+  .dd-ba { grid-template-columns: minmax(0, 1fr); }
+}
+.dd-ba-card {
+  border-radius: 12px;
+  padding: 1rem 1.125rem 1.125rem;
+  border: 1px solid var(--dd-line);
+  background: var(--dd-cream);
+}
+.dd-ba-card.is-after {
+  background: var(--dd-green-bg);
+  border-color: #c6e3d3;
+}
+.dd-ba-title {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  margin: 0 0 0.625rem;
+  color: var(--dd-ink-2);
+}
+.dd-ba-card.is-after .dd-ba-title { color: var(--dd-green); }
+.dd-ba-list { list-style: none; margin: 0; padding: 0; font-size: 0.9375rem; line-height: 1.75; }
+.dd-ba-list li {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-top: 0.375rem;
+}
+.dd-ba-list li::before {
+  content: "・";
+  position: absolute;
+  left: 0.1875rem;
+  color: var(--dd-ink-3);
+}
+.dd-ba-card.is-after .dd-ba-list li::before { content: "✓"; color: var(--dd-green); font-size: 0.75rem; top: 0.125rem; }
+.dd-ba-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--dd-ink-3);
+  font-size: 1.5rem;
+  font-weight: 300;
+}
+@media (max-width: 720px) {
+  .dd-ba-arrow { transform: rotate(90deg); padding: 0.25rem 0; }
+}
+
+/* 手順 */
+.dd-steps { list-style: none; margin: 0; padding: 0; counter-reset: dd-step; }
+.dd-steps > li {
+  position: relative;
+  padding: 0 0 0 2.75rem;
+  margin-top: 1rem;
+  counter-increment: dd-step;
+}
+.dd-steps > li::before {
+  content: counter(dd-step);
+  position: absolute;
+  left: 0;
+  top: 0.0625rem;
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 50%;
+  background: var(--dd-ink);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-variant-numeric: tabular-nums;
+}
+.dd-step-action { font-weight: 700; line-height: 1.7; }
+.dd-step-sees {
+  margin-top: 0.375rem;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--dd-ink-2);
+  background: var(--dd-cream);
+  border-radius: 10px;
+  padding: 0.5625rem 0.8125rem;
+}
+.dd-step-sees::before {
+  content: "画面はこうなります";
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--dd-ink-3);
+  margin-bottom: 0.1875rem;
+}
+
+/* 図版（注釈枠を重ねられる） */
+.dd-figure { margin: 0; }
+.dd-figure-frame {
+  position: relative;
+  display: block;
+  border: 1px solid var(--dd-line-2);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  line-height: 0;
+}
+.dd-figure-frame img { width: 100%; height: auto; display: block; }
+.dd-focus {
+  position: absolute;
+  border: 2.5px solid var(--dd-violet);
+  border-radius: 6px;
+  box-shadow: 0 0 0 9999px rgb(61 53 48 / 0%);
+  pointer-events: none;
+}
+.dd-focus[data-tone="warn"] { border-color: var(--dd-rose); }
+.dd-focus[data-tone="muted"] { border-color: var(--dd-ink-3); }
+.dd-focus-label {
+  position: absolute;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 1.35;
+  white-space: nowrap;
+  background: var(--dd-violet);
+  color: #fff;
+  padding: 0.1875rem 0.4375rem;
+  border-radius: 5px;
+}
+.dd-focus[data-tone="warn"] .dd-focus-label { background: var(--dd-rose); }
+.dd-focus[data-tone="muted"] .dd-focus-label { background: var(--dd-ink-2); }
+.dd-focus-label[data-side="bottom"] { top: calc(100% + 5px); left: 50%; transform: translateX(-50%); }
+.dd-focus-label[data-side="top"] { bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); }
+.dd-focus-label[data-side="left"] { right: calc(100% + 7px); top: 50%; transform: translateY(-50%); }
+.dd-focus-label[data-side="right"] { left: calc(100% + 7px); top: 50%; transform: translateY(-50%); }
+.dd-figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--dd-ink-2);
+}
+
+/* 表 */
+.dd-table-wrap { overflow-x: auto; border: 1px solid var(--dd-line); border-radius: 10px; }
+.dd-table { width: 100%; border-collapse: collapse; font-size: 0.9375rem; line-height: 1.7; }
+.dd-table.is-dense { font-size: 0.875rem; line-height: 1.65; }
+.dd-table th {
+  background: var(--dd-cream);
+  text-align: left;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  padding: 0.5625rem 0.875rem;
+  border-bottom: 2px solid var(--dd-line-2);
+  white-space: nowrap;
+}
+.dd-table td {
+  padding: 0.6875rem 0.875rem;
+  border-bottom: 1px solid var(--dd-line);
+  vertical-align: top;
+}
+.dd-table tr:last-child td { border-bottom: none; }
+.dd-table tbody tr:nth-child(even) { background: #fdfcfa; }
+.dd-table td:first-child { font-weight: 700; min-width: 11rem; }
+.dd-table.is-dense td:first-child { min-width: 16rem; color: var(--dd-ink); }
+.dd-table-note { margin-top: 0.5rem; font-size: 0.8125rem; color: var(--dd-ink-2); }
+
+/* 囲み */
+.dd-callout {
+  border-radius: 12px;
+  padding: 0.9375rem 1.125rem 1rem;
+  border-left: 5px solid var(--dd-ink-3);
+  background: var(--dd-cream);
+  font-size: 0.96875rem;
+  line-height: 1.85;
+}
+.dd-callout[data-tone="info"] { border-left-color: var(--dd-violet); background: var(--dd-violet-bg); }
+.dd-callout[data-tone="warn"] { border-left-color: var(--dd-rose); background: var(--dd-rose-bg); }
+.dd-callout[data-tone="tip"] { border-left-color: var(--dd-green); background: var(--dd-green-bg); }
+.dd-callout[data-tone="story"] { border-left-color: var(--dd-orange); background: var(--dd-orange-bg); }
+.dd-callout-title {
+  font-weight: 800;
+  font-size: 0.9375rem;
+  margin-bottom: 0.3125rem;
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+}
+.dd-callout-title::before { font-size: 0.875rem; }
+.dd-callout[data-tone="info"] .dd-callout-title { color: var(--dd-violet); }
+.dd-callout[data-tone="info"] .dd-callout-title::before { content: "📌"; }
+.dd-callout[data-tone="warn"] .dd-callout-title { color: var(--dd-rose); }
+.dd-callout[data-tone="warn"] .dd-callout-title::before { content: "⚠"; }
+.dd-callout[data-tone="tip"] .dd-callout-title { color: var(--dd-green); }
+.dd-callout[data-tone="tip"] .dd-callout-title::before { content: "💡"; }
+.dd-callout[data-tone="story"] .dd-callout-title { color: var(--dd-orange); }
+.dd-callout[data-tone="story"] .dd-callout-title::before { content: "🔍"; }
+
+/* 時系列 */
+.dd-timeline { list-style: none; margin: 0; padding: 0; position: relative; }
+/* ⚠ 日付・縦線・ドット・本文の4つの位置は連動している。1つ動かすと日付に
+   ドットが重なる（実際に起きた）。日付列 64px → ドット 66.4〜77.4px → 本文 88px の順で、
+   どこも重ならないようにしてある */
+.dd-timeline::before {
+  content: "";
+  position: absolute;
+  left: 4.5rem;
+  top: 0.75rem;
+  bottom: 0.75rem;
+  width: 2px;
+  background: var(--dd-line-2);
+}
+.dd-timeline > li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4rem minmax(0, 1fr);
+  gap: 1.5rem;
+  padding-bottom: 1.125rem;
+}
+.dd-timeline > li:last-child { padding-bottom: 0; }
+.dd-tl-date {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--dd-ink-2);
+  text-align: right;
+  padding-top: 0.0625rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.dd-timeline > li::before {
+  content: "";
+  position: absolute;
+  left: 4.15rem;
+  top: 0.4375rem;
+  width: 0.6875rem;
+  height: 0.6875rem;
+  border-radius: 50%;
+  background: var(--dd-card);
+  border: 2.5px solid var(--dd-orange);
+  z-index: 1;
+}
+.dd-tl-title { font-weight: 800; line-height: 1.6; margin-bottom: 0.1875rem; }
+.dd-tl-text { font-size: 0.9375rem; line-height: 1.8; color: var(--dd-ink-2); }
+@media (max-width: 720px) {
+  .dd-timeline::before { left: 0.3125rem; }
+  .dd-timeline > li { grid-template-columns: minmax(0, 1fr); gap: 0.125rem; padding-left: 1.5rem; }
+  .dd-timeline > li::before { left: 0; }
+  .dd-tl-date { text-align: left; }
+}
+
+/* 画面に出る文言 */
+.dd-message {
+  border: 1px dashed var(--dd-line-2);
+  border-radius: 10px;
+  padding: 0.75rem 0.9375rem;
+  background: #fdfcfa;
+}
+.dd-message-text {
+  font-weight: 700;
+  line-height: 1.7;
+  padding-left: 1.5rem;
+  position: relative;
+}
+.dd-message-text::before {
+  content: "「";
+  position: absolute;
+  left: 0.25rem;
+  color: var(--dd-ink-3);
+  font-size: 1.25rem;
+  top: -0.125rem;
+}
+.dd-message-todo {
+  margin-top: 0.4375rem;
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--dd-ink-2);
+}
+
+/* ===== 絞り込み ===== */
+.dd-filters {
+  display: flex;
+  gap: 0.375rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.dd-filter {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.375rem 0.875rem;
+  border-radius: 999px;
+  border: 1px solid var(--dd-line-2);
+  background: var(--dd-card);
+  color: var(--dd-ink-2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.dd-filter:hover { background: var(--dd-cream); }
+.dd-filter.is-on {
+  background: var(--dd-ink);
+  color: #fff;
+  border-color: var(--dd-ink);
+}
+
+/* ===== 図版の台紙 =====
+   白いUIキャプチャをクリーム地の上に直接置くと輪郭が溶けるため、
+   無彩色のマットに載せる（写真を台紙に貼る要領） */
+.dd-figure-mat {
+  display: block;
+  background: var(--dd-mat);
+  border: 1px solid var(--dd-mat-line);
+  border-radius: 12px;
+  padding: 9px;
+  line-height: 0;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 8px 22px rgb(61 53 48 / 10%);
+}
+.dd-figure--wide {
+  width: calc(100% + var(--dd-over, 0px));
+  max-width: none !important;
+}
+
+/* 手順と写真を結ぶ番号ピン */
+.dd-focus-pin {
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--dd-violet);
+  color: #fff;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 3px 8px rgb(61 53 48 / 30%);
+}
+.dd-focus[data-tone="warn"] .dd-focus-pin { background: var(--dd-rose); }
+.dd-step-pin {
+  margin-left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--dd-violet);
+  background: var(--dd-violet-bg);
+  border-radius: 999px;
+  padding: 0.0625rem 0.5rem;
+  white-space: nowrap;
+}
+
+/* before → after の判定バー（読み飛ばした人がこの1行で結論を取れる） */
+.dd-ba-verdict {
+  margin-top: 0.625rem;
+  background: var(--dd-green-bg);
+  border: 1px solid #c6e3d3;
+  border-radius: 10px;
+  padding: 0.5rem 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #14532d;
+  display: flex;
+  gap: 0.625rem;
+  align-items: baseline;
+  line-height: 1.7;
+}
+.dd-ba-verdict > span {
+  flex: none;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  background: var(--dd-green);
+  color: #fff;
+  padding: 0.125rem 0.4375rem;
+  border-radius: 4px;
+}
+
+/* 見出しの調子（日誌のビート） */
+.dd-h[data-tone="win"]::before { background: #7ec8a0; }
+.dd-h[data-tone="turn"]::before { background: #e0b53c; }
+.dd-h[data-tone="note"]::before { background: #6baedb; }
+.dd-h[data-tone="miss"]::before { background: var(--dd-maste-gray); }
+.dd-h-date {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: var(--dd-ink-3);
+  font-variant-numeric: tabular-nums;
+  margin-right: 0.125rem;
+}
+
+/* 空振り（うまくいかなかった試み）。この日誌の芯なので専用の顔を持たせる */
+.dd-callout[data-tone="miss"] {
+  background: var(--dd-gray-bg);
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 7px,
+    rgb(61 53 48 / 3%) 7px 8px
+  );
+  border: 1.5px dashed var(--dd-gray-soft);
+  border-left: 5px solid var(--dd-gray);
+}
+.dd-callout[data-tone="miss"] .dd-callout-title { color: var(--dd-gray); }
+.dd-callout[data-tone="miss"] .dd-callout-title::before { content: "🌀"; }
+
+/* くわしい話（読まなくても記事は完結する） */
+.dd-details {
+  border: 1px solid var(--dd-line);
+  border-radius: 12px;
+  background: #fdfcfa;
+}
+.dd-details > summary {
+  cursor: pointer;
+  padding: 0.6875rem 0.9375rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dd-ink-2);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4375rem;
+}
+.dd-details > summary::-webkit-details-marker { display: none; }
+.dd-details > summary::before {
+  content: "▸";
+  color: var(--dd-ink-3);
+  transition: transform 0.18s ease-out;
+}
+.dd-details[open] > summary::before { transform: rotate(90deg); }
+.dd-details-body { padding: 0 0.9375rem 0.9375rem; }
+.dd-details-body > * + * { margin-top: 1rem; }
+
+/* ===== 記事どうしの仕切り（綴じ穴） ===== */
+.dd-binder {
+  position: relative;
+  height: 26px;
+  margin: 0 0 2rem;
+}
+.dd-binder::before {
+  content: "";
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: 50%;
+  border-top: 2px dashed var(--dd-rail);
+}
+.dd-binder i {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin-top: -6px;
+  border-radius: 50%;
+  background: var(--dd-cream);
+  border: 1px solid var(--dd-rail);
+}
+.dd-binder i:nth-child(1) { left: 22%; }
+.dd-binder i:nth-child(2) { left: 50%; }
+.dd-binder i:nth-child(3) { left: 78%; }
+
+/* ===== 画面別インデックス（記事は日付ではなく「画面」から引く） ===== */
+.dd-index {
+  max-width: 1180px;
+  margin: 0 auto 1.5rem;
+}
+.dd-index-h {
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--dd-ink-2);
+  margin: 0 0 0.625rem;
+}
+.dd-index-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
+  gap: 0.5rem;
+}
+.dd-index-tile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--dd-card);
+  border: 1px solid var(--dd-line);
+  border-left: 6px solid var(--dd-zone, var(--dd-ink-3));
+  border-radius: 3px 12px 12px 3px;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--dd-ink);
+  transition: transform 0.15s ease-out, box-shadow 0.15s ease-out;
+}
+.dd-index-tile:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 5%), 0 6px 18px rgb(61 53 48 / 8%);
+}
+.dd-index-tile.is-on {
+  background: var(--dd-zone-bg, var(--dd-cream));
+  box-shadow: inset 0 0 0 1.5px var(--dd-zone, var(--dd-ink-3));
+}
+.dd-index-emoji { font-size: 1.125rem; line-height: 1; flex: none; }
+.dd-index-count {
+  margin-left: auto;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  color: var(--dd-ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== いまの使い方 まとめ ===== */
+.dd-now {
+  max-width: 1180px;
+  margin: 0 auto 1.75rem;
+  background: var(--dd-green-bg);
+  border: 1px solid #c6e3d3;
+  border-radius: 14px;
+  padding: 1.125rem 1.25rem 1.25rem;
+}
+.dd-now-h {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+  font-weight: 900;
+  color: #14532d;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.dd-now-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  gap: 0.75rem;
+}
+.dd-now-card {
+  background: #fff;
+  border: 1px solid #c6e3d3;
+  border-radius: 12px;
+  padding: 0.75rem 0.875rem 0.875rem;
+}
+.dd-now-card.is-past {
+  background: var(--dd-gray-bg);
+  border-color: var(--dd-gray-soft);
+}
+.dd-now-title {
+  font-size: 0.875rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem;
+  color: var(--dd-green);
+}
+.dd-now-card.is-past .dd-now-title { color: var(--dd-gray); }
+.dd-now-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: dd-now;
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+.dd-now-steps li {
+  position: relative;
+  padding-left: 1.5rem;
+  counter-increment: dd-now;
+  margin-top: 0.1875rem;
+}
+.dd-now-steps li::before {
+  content: counter(dd-now);
+  position: absolute;
+  left: 0;
+  top: 0.25rem;
+  width: 1.0625rem;
+  height: 1.0625rem;
+  border-radius: 50%;
+  background: var(--dd-green);
+  color: #fff;
+  font-size: 0.625rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dd-now-card.is-past .dd-now-steps li::before { background: var(--dd-gray); }
+.dd-now-was {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--dd-ink-3);
+  text-decoration: line-through;
+  line-height: 1.6;
+}
+.dd-now-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--dd-green);
+}
+
+/* ===== 印刷（福祉の現場は紙で手元に置く） ===== */
+@media print {
+  .dd-root {
+    background: #fff;
+    background-image: none;
+    margin: 0;
+    padding: 0;
+  }
+  .dd-toc,
+  .dd-filters,
+  .dd-index,
+  .dd-masthead-meta,
+  .dd-binder { display: none !important; }
+  .dd-layout { display: block; }
+  .dd-post {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    break-inside: auto;
+  }
+  .dd-steps > li,
+  .dd-ba,
+  .dd-callout,
+  .dd-figure { break-inside: avoid; }
+  .dd-table { font-size: 0.75rem; }
+  .dd-figure { max-width: 480px !important; }
+  a[href]::after { content: ""; }
+}
+@page {
+  margin: 14mm;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   ここから下だけが 月刊ぴあん ぶんの追記。
+   上の955行は あとりえ送迎システム（sougei-system）の
+   dev-diary.css をそのまま持ってきたもので、1文字も直していない。
+   上を直したくなったら、移植元も同じように直すかを先に考えること。
+   ══════════════════════════════════════════════════════════════ */
+
+/* 書体。移植元は next/font で自ホストしていたが、ここは素のHTMLなので
+   diary.html の <link> で Google Fonts から読む。変数名は移植元と同じ。 */
+.dd-root{
+  --dd-font-round:"Zen Maru Gothic","Hiragino Maru Gothic ProN";
+  --dd-font-body:"Zen Kaku Gothic New","Hiragino Sans","BIZ UDPGothic";
+
+  /* 外枠。移植元は <main class="p-4"> の内側だったので margin:-1rem で
+     それを打ち消していた。ここは body 直下なので打ち消しは要らない。 */
+  position:relative; z-index:1;     /* pian.css の body::before（紙の粒子）より上に出す */
+  margin:0;
+  padding:0 14px 3rem;
+  min-height:calc(100vh - 200px);   /* 200px ＝ ヘッダー＋フッターのおよその高さ */
+}
+
+/* 日誌のページには下部ドックが出ないので、そのぶんの余白を戻す */
+body.diary-page{ padding-bottom:0; }
+
+/* もどる導線（日誌ページのヘッダー） */
+.diary-back{
+  margin:0 0 12px; text-align:center;
+}
+.diary-back a{
+  display:inline-flex; align-items:center; gap:6px;
+  min-height:44px; padding:0 16px;
+  font-family:var(--font-head); font-size:13px; text-decoration:none;
+  color:var(--brand-d); background:rgba(255,255,255,.9);
+  border:2px solid var(--brand); border-radius:999px;
+}
+
+/* スマホでは目次を畳む。移植元は 1080px 超でサイドバーに出る作りで、
+   それ以下では本文の上に積まれる。保護者はほぼスマホなので、
+   長い目次が本文より先に来ないよう <details> にしてある（diary.js 側） */
+.dd-toc-fold{
+  margin:0 0 1.25rem;
+  border:2px solid var(--dd-line-2); border-radius:12px;
+  background:var(--dd-card);
+}
+.dd-toc-fold > summary{
+  padding:.7rem .9rem; cursor:pointer;
+  font-family:var(--dd-font-round), sans-serif; font-weight:700;
+  color:var(--dd-ink);
+}
+.dd-toc-fold > summary::marker{ color:var(--dd-ink-3); }
+.dd-toc-fold .dd-toc{
+  position:static; padding:0 .9rem .9rem; border:0; background:none;
+  max-height:none; overflow:visible;
+}
+.dd-toc-fold .dd-toc-h{ display:none; }
+@media (min-width:1081px){
+  /* 広い画面では移植元どおり左のサイドバーに出す（.dd-layout と同じ境目）。
+     畳む枠のほうは素通しにして、中の .dd-toc をそのまま見せる */
+  .dd-toc-fold{ border:0; background:none; }
+  .dd-toc-fold > summary{ display:none; }
+  .dd-toc-fold .dd-toc{ padding:0; }
+}

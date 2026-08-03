@@ -449,7 +449,9 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 
 /* ══════════ フッター ══════════ */
 .foot{
-  margin:44px 0 0; padding:0 0 16px; text-align:center;
+  /* 左右は auto。0 にすると .wrap の中央寄せを打ち消してしまい、
+     680px より広い画面（パソコン）でフッターだけ左に寄る */
+  margin:44px auto 0; padding:0 0 16px; text-align:center;
   font-size:12px; color:var(--ink-3); line-height:1.9;
 }
 .rainbow{

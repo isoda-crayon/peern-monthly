@@ -318,6 +318,9 @@
 
   function render() {
     var posts = visiblePosts();
+    /* 日誌の色（--dd-*）はぜんぶ .dd-root に載っている。これが無いと
+       文字も枠も背景も全部そこだけ抜けるので、描くたびに付け直す。 */
+    root.className = "dd-root";
     root.innerHTML =
       '<header class="dd-masthead">' +
         "<div>" +

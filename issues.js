@@ -26,6 +26,42 @@ window.PIAN = {
   },
   issues: [
     {
+      id: "2026-09", year: 2026, month: 9,
+      label: "2026年9月号", short: "9月号",
+      brands: {
+        atelier: {
+          catch: "うさぎ みえるかな？",
+          note: "9月21日・22日・23日はお休みです。",
+          thumb: {"src": "images/2026-09/atelier/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-09/atelier/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年9月号"},
+            {"src": "images/2026-09/atelier/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "ラインナップゲーム（山）", "sub": "きょうかかだい ①〜⑤週目"},
+            {"src": "images/2026-09/atelier/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "イメージでホッとタイム", "sub": "めいそうかだい ①〜⑤週目"},
+            {"src": "images/2026-09/atelier/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "アートダイアローグ（カメレオン）", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-09/atelier/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "みんなの怒りスイッチをさがせ！", "sub": "メインかだい ②週目"},
+            {"src": "images/2026-09/atelier/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "怒り方マスターになろう", "sub": "メインかだい ③週目"},
+            {"src": "images/2026-09/atelier/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "センサリーボトル", "sub": "メインかだい ④〜⑤週目"},
+            {"src": "images/2026-09/atelier/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "9月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        },
+        nijiiro: {
+          catch: "うさぎ みえるかな？",
+          note: "9月22日・23日はお休みです。",
+          thumb: {"src": "images/2026-09/nijiiro/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-09/nijiiro/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年9月号"},
+            {"src": "images/2026-09/nijiiro/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "さまことば", "sub": "きょうかかだい ①〜⑤週目"},
+            {"src": "images/2026-09/nijiiro/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "戦士のポーズでホッとタイム", "sub": "めいそうかだい ①〜⑤週目"},
+            {"src": "images/2026-09/nijiiro/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "おめめをきたえよう選手権", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-09/nijiiro/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "ゴムバンド", "sub": "メインかだい ②週目"},
+            {"src": "images/2026-09/nijiiro/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "マグネット", "sub": "メインかだい ③週目"},
+            {"src": "images/2026-09/nijiiro/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "この音はなんだろう？選手権", "sub": "メインかだい ④〜⑤週目"},
+            {"src": "images/2026-09/nijiiro/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "9月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        }
+      }
+    },
+    {
       id: "2026-08", year: 2026, month: 8,
       label: "2026年8月号", short: "8月号",
       brands: {

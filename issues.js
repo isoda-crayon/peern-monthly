@@ -1,23 +1,22 @@
 /* 月刊ぴあん — 号のデータ（バックナンバーの一覧はここが元になります）
  *
- * ■ 新しい号を足すときの手順
- *   1) 原本PDFを共有ドライブの「⑤ ぴあんチラシ」に置く
- *        あとりえチラシ_2026年09月.pdf / にじいろチラシ_2026年09月.pdf
- *   2) ページ画像に変換する（両事業所まとめて）
- *        python tools/add_issue.py --ym 2026-09
- *   3) このファイルの issues 配列の「先頭」に、下と同じ形で1件足す
- *      （src / w / h は 2) が表示するJSONをそのまま使えます）
- *   4) 保存して push すれば、サイトに新しい号が並びます
+ * ⚠ このファイルは index.html / nijiiro.html から <script src> で読まれる公開ファイルです。
+ *   ブラウザの「ソースを表示」でそのまま読めます。原本の保管場所・変換のやり方・
+ *   事業所の内部手順は**ここに書かないこと**。それらは README.md（職員向け）にあります。
+ *   ここに置いてよいのは、課題名・週・ページ画像だけです。
+ *
+ * ■ 新しい号を足す手順 → README.md「毎月やること」を見てください
  *
  * ■ sec（ページの種類）に使える値
  *   cover=表紙 / schedule=スケジュール / subject=きょうかかだい
  *   meditation=めいそうかだい / main=メインかだい
- *   other=1枚に複数の課題がまとまった以前の形式（2026年3月以前の号）
+ *   other=1枚に複数の課題がまとまった以前の形式
+ *         （あとりえは2026年3月号まで、にじいろは2026年4月号まで。事業所で切り替わりが1か月ずれます）
  *
  * ■ crop（任意）
  *   下が余白だけのページで、上から何割を見せるか（0.5＝上半分）。
- *   隠した部分は画面では見られなくなるので、余白だけのページにしか使いません。
- *   （「いんさつ・PDFでほぞん」では全体が出ます）
+ *   隠した部分は縦スクロール面では見られなくなるので、余白だけのページにしか使いません。
+ *   （「よむ画面」と「いんさつ・PDFでほぞん」では全体が出ます）
  */
 window.PIAN = {
   brands: {
@@ -667,9 +666,9 @@ window.PIAN = {
           thumb: {"src": "images/2024-12/nijiiro/thumb.webp", "w": 240, "h": 240},
           pages: [
             {"src": "images/2024-12/nijiiro/p1.webp", "w": 1600, "h": 2263, "sec": "cover", "title": "表紙", "sub": "2024年12月号"},
-            {"src": "images/2024-12/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "算数・注意訓練トレーニング", "sub": "教科課題・瞑想"},
-            {"src": "images/2024-12/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "はたらく細胞シアター1・はたらく細胞シアター2・万華鏡", "sub": "メイン課題 講座系課題・ものづくり系課題"},
-            {"src": "images/2024-12/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "利きチョコ選手権・ぴあん 12月スケジュール表", "sub": "単発系課題・1か月のよてい"}
+            {"src": "images/2024-12/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "算数・注意訓練トレーニング", "sub": "きょうかかだい・めいそうかだい"},
+            {"src": "images/2024-12/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "はたらく細胞シアター1・はたらく細胞シアター2・万華鏡", "sub": "メインかだい"},
+            {"src": "images/2024-12/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "利きチョコ選手権・ぴあん 12月スケジュール表", "sub": "メインかだい・スケジュール"}
           ]
         }
       }
@@ -684,8 +683,8 @@ window.PIAN = {
           thumb: {"src": "images/2024-11/nijiiro/thumb.webp", "w": 240, "h": 240},
           pages: [
             {"src": "images/2024-11/nijiiro/p1.webp", "w": 1600, "h": 2263, "sec": "cover", "title": "表紙", "sub": "2024年11月号"},
-            {"src": "images/2024-11/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "国語・ポーズ瞑想(手動瞑想)", "sub": "教科課題・瞑想"},
-            {"src": "images/2024-11/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "この音の主はなんだろう？選手権・利きチョコ選手権・アンガーマネジメント1・アンガーマネジメント2", "sub": "メイン課題 単発系課題・講座系課題"},
+            {"src": "images/2024-11/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "国語・ポーズ瞑想(手動瞑想)", "sub": "きょうかかだい・めいそうかだい"},
+            {"src": "images/2024-11/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "この音の主はなんだろう？選手権・利きチョコ選手権・アンガーマネジメント1・アンガーマネジメント2", "sub": "メインかだい"},
             {"src": "images/2024-11/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "ぴあん 11月スケジュール表", "sub": "1か月のよてい"}
           ]
         }
@@ -701,8 +700,8 @@ window.PIAN = {
           thumb: {"src": "images/2024-10/nijiiro/thumb.webp", "w": 240, "h": 240},
           pages: [
             {"src": "images/2024-10/nijiiro/p1.webp", "w": 1600, "h": 2263, "sec": "cover", "title": "表紙", "sub": "2024年10月号"},
-            {"src": "images/2024-10/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "算数・宇宙人の日", "sub": "教科課題・瞑想"},
-            {"src": "images/2024-10/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "ストライクASIA・番犬ガオガオの庭・これな〜んだ？10 どうぶつ編・マステのビニール傘", "sub": "メイン課題 課題①・課題②"},
+            {"src": "images/2024-10/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "算数・宇宙人の日", "sub": "きょうかかだい・めいそうかだい"},
+            {"src": "images/2024-10/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "ストライクASIA・番犬ガオガオの庭・これな〜んだ？10 どうぶつ編・マステのビニール傘", "sub": "メインかだい"},
             {"src": "images/2024-10/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "ぴあん 10月スケジュール表", "sub": "1か月のよてい"}
           ]
         }
@@ -718,8 +717,8 @@ window.PIAN = {
           thumb: {"src": "images/2024-09/nijiiro/thumb.webp", "w": 240, "h": 240},
           pages: [
             {"src": "images/2024-09/nijiiro/p1.webp", "w": 1600, "h": 2263, "sec": "cover", "title": "表紙", "sub": "2024年9月号"},
-            {"src": "images/2024-09/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "国語・1，2，3で拍手！", "sub": "教科課題・瞑想"},
-            {"src": "images/2024-09/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "はたらく細胞シアター・かぜ症候群1・かぜ症候群2・LaQ・2025年カレンダー・立体動物園", "sub": "メイン課題"},
+            {"src": "images/2024-09/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "国語・1，2，3で拍手！", "sub": "きょうかかだい・めいそうかだい"},
+            {"src": "images/2024-09/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "はたらく細胞シアター・かぜ症候群1・かぜ症候群2・LaQ・2025年カレンダー・立体動物園", "sub": "メインかだい"},
             {"src": "images/2024-09/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "ぴあん 9月スケジュール表", "sub": "1か月のよてい"}
           ]
         }
@@ -735,9 +734,9 @@ window.PIAN = {
           thumb: {"src": "images/2024-08/nijiiro/thumb.webp", "w": 240, "h": 240},
           pages: [
             {"src": "images/2024-08/nijiiro/p1.webp", "w": 1600, "h": 2263, "sec": "cover", "title": "表紙", "sub": "2024年8月号"},
-            {"src": "images/2024-08/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "算数・かたをまわそう", "sub": "教科課題・瞑想"},
-            {"src": "images/2024-08/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "おめめをきたえよう選手権・ペーパークラフト・巨大恐竜", "sub": "メイン課題"},
-            {"src": "images/2024-08/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "オーナメント・キーホルダー・モビール・金魚・ぴあん 8月スケジュール表", "sub": "メイン課題・1か月のよてい"}
+            {"src": "images/2024-08/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "算数・かたをまわそう", "sub": "きょうかかだい・めいそうかだい"},
+            {"src": "images/2024-08/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "おめめをきたえよう選手権・ペーパークラフト・巨大恐竜", "sub": "メインかだい"},
+            {"src": "images/2024-08/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "オーナメント・キーホルダー・モビール・金魚・ぴあん 8月スケジュール表", "sub": "メインかだい・スケジュール"}
           ]
         }
       }
@@ -752,9 +751,9 @@ window.PIAN = {
           thumb: {"src": "images/2024-07/nijiiro/thumb.webp", "w": 240, "h": 240},
           pages: [
             {"src": "images/2024-07/nijiiro/p1.webp", "w": 1600, "h": 2263, "sec": "cover", "title": "表紙", "sub": "2024年7月号"},
-            {"src": "images/2024-07/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "国語・池のなみ", "sub": "教科課題・瞑想"},
-            {"src": "images/2024-07/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "たまつむバランス・クラスター・センサリーボトル・キラキラボトル・アクアリウム", "sub": "メイン課題"},
-            {"src": "images/2024-07/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "おめめをきたえよう選手権・ぴあん 7月スケジュール表", "sub": "メイン課題・1か月のよてい"}
+            {"src": "images/2024-07/nijiiro/p2.webp", "w": 1600, "h": 2263, "sec": "other", "title": "国語・池のなみ", "sub": "きょうかかだい・めいそうかだい"},
+            {"src": "images/2024-07/nijiiro/p3.webp", "w": 1600, "h": 2263, "sec": "other", "title": "たまつむバランス・クラスター・センサリーボトル・キラキラボトル・アクアリウム", "sub": "メインかだい"},
+            {"src": "images/2024-07/nijiiro/p4.webp", "w": 1600, "h": 2263, "sec": "other", "title": "おめめをきたえよう選手権・ぴあん 7月スケジュール表", "sub": "メインかだい・スケジュール"}
           ]
         }
       }

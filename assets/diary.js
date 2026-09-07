@@ -63,6 +63,15 @@
 
   function styleAttr(s) { return s ? ' style="' + esc(s) + '"' : ""; }
 
+  /* screens に無い screen 名（打ち間違い）を書いても、日誌が真っ白にならないように受け止める。
+     以前は st.zone を直接読んでいたので TypeError が render() を突き抜け、
+     本文が出ないだけでなく、もどるリンク・ブランドの色・既読の印・SW登録まで
+     まとめて実行されなかった（にじいろの人があとりえに飛ばされる）。 */
+  var FALLBACK_SCREEN = { emoji: "📄", zone: "#867b70", bg: "#f2ede6" };
+  function screenOf(name) {
+    return (D.screens && D.screens[name]) || FALLBACK_SCREEN;
+  }
+
   /* ══════════ 図版 ══════════ */
 
   /* crop があるとき、枠の縦横比を切り出し矩形に合わせ、画像を拡大してずらす。
@@ -174,7 +183,7 @@
                "</div>";
 
       case "callout":
-        return '<div class="dd-callout" data-tone="' + esc(b.tone) + '">' +
+        return '<div class="dd-callout" data-tone="' + esc(b.tone || "info") + '">' +
                  '<p class="dd-callout-title">' + esc(b.title) + "</p>" +
                  "<p>" + rich(b.text) + "</p>" +
                "</div>";
@@ -248,12 +257,12 @@
   function indexHtml(active) {
     var counts = countByScreen();
     var tiles = D.screenOrder.filter(function (s) { return counts[s]; }).map(function (s) {
-      var st = D.screens[s];
+      var st = screenOf(s);
       var on = active === s;
       return '<button type="button" class="dd-index-tile' + (on ? " is-on" : "") + '"' +
                ' style="--dd-zone:' + esc(st.zone) + ";--dd-zone-bg:" + esc(st.bg) + '"' +
                ' data-screen="' + esc(s) + '" aria-pressed="' + (on ? "true" : "false") + '">' +
-               '<span class="dd-index-emoji" aria-hidden="true">' + st.emoji + "</span>" +
+               '<span class="dd-index-emoji" aria-hidden="true">' + esc(st.emoji) + "</span>" +
                esc(s) +
                '<span class="dd-index-count">' + counts[s] + "</span>" +
              "</button>";
@@ -273,7 +282,7 @@
                  posts.map(function (p) {
                    return '<li data-slug="' + esc(p.slug) + '">' +
                             '<a href="#post-' + esc(p.slug) + '" class="dd-toc-item"' +
-                              ' style="border-left-color:' + esc(D.screens[p.screen].zone) + '">' +
+                              ' style="border-left-color:' + esc(screenOf(p.screen).zone) + '">' +
                               '<span class="dd-toc-date">' + formatShort(p.date) + "</span>" +
                               esc(p.title) +
                             "</a>" +
@@ -285,10 +294,10 @@
   }
 
   function postHtml(p) {
-    var st = D.screens[p.screen];
+    var st = screenOf(p.screen);
     return '<article id="post-' + esc(p.slug) + '" class="dd-post" style="--dd-zone:' + esc(st.zone) + '">' +
              '<span class="dd-tape" data-cat="' + esc(p.category) + '">' +
-               st.emoji + " " + esc(p.screen) + " ／ " + esc(p.category) +
+               esc(st.emoji) + " " + esc(p.screen) + " ／ " + esc(p.category) +
              "</span>" +
              '<div class="dd-post-head">' +
                "<h2>" + esc(p.title) + "</h2>" +
@@ -391,10 +400,9 @@
 
   /* ══════════ 起動 ══════════ */
 
-  render();
-
-  /* 開いた時点で「読んだ」印を付ける（入口の赤い点が消えます） */
-  try { window.localStorage.setItem(SEEN_KEY, D.latest); } catch (err) { /* 使えない環境では何もしない */ }
+  /* 記事の描画より先に済ませる。ここが render() のあとにあると、記事データの
+     書き間違い1つで例外が出たときに、もどり先もブランドの色も既読の印も
+     まとめて付かなくなる（にじいろの人があとりえのページに飛ばされる）。 */
 
   /* もどり先。にじいろくれよんから来たときは ?b=nijiiro が付いています */
   var isNijiiro = /(^|[?&])b=nijiiro(&|$)/.test(location.search);
@@ -405,7 +413,12 @@
     back.textContent = "← " + (isNijiiro ? "にじいろくれよん" : "あとりえくれよん") + "の 月刊ぴあんに もどる";
   }
 
+  /* 開いた時点で「読んだ」印を付ける（入口の赤い点が消えます） */
+  try { window.localStorage.setItem(SEEN_KEY, D.latest); } catch (err) { /* 使えない環境では何もしない */ }
+
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js").catch(function () {});
   }
+
+  render();
 })();

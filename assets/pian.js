@@ -25,7 +25,8 @@
     subject:    { icon: "✏️", name: "きょうかかだい", short: "きょうか", lead: "べんきょうの課題",         color: "#6bb2dd" },
     meditation: { icon: "🧘", name: "めいそうかだい", short: "めいそう", lead: "こころを落ちつける時間",   color: "#8e84cf" },
     main:       { icon: "🎨", name: "メインかだい",   short: "メイン",   lead: "週ごとの活動",             color: "#f0a259" },
-    /* 2026年3月以前の号は1枚に複数の課題がまとまっているので、まとめて出す */
+    /* 以前の形式は1枚に複数の課題がまとまっているので、まとめて出す
+       （あとりえは2026年3月号まで、にじいろは2026年4月号まで。切り替わりが1か月ずれます） */
     other:      { icon: "📄", name: "この月のないよう", short: "ないよう", lead: "1枚に何こかの課題がのっています", color: "#d8ae3c" }
   };
   var SEC_ORDER = ["schedule", "subject", "meditation", "main", "other"];
@@ -72,6 +73,23 @@
     if (!c) return [];
     return c.pages.filter(function (p) { return p.sec === sec; });
   }
+  /** 画面に出す順に並べたページ。
+   *  原本のページ順（issues.js の pages の並び）と、画面で読ませたい順は違います。
+   *  2026年4月号以降は原本が「表紙→きょうか→めいそう→メイン→スケジュール」なのに対し、
+   *  縦スクロール面は SEC_ORDER（スケジュールが先）で並べているためです。
+   *  ここを唯一の並び順の元にして、縦スクロール面・ビューア・「◯/◯」の3つを揃えます。
+   *  （ここが c.pages のままだと、よこスワイプの順と画面の並びが食い違います） */
+  function orderedPages(issue) {
+    var c = content(issue);
+    if (!c) return [];
+    var out = c.pages.filter(function (p) { return p.sec === "cover"; });
+    SEC_ORDER.forEach(function (s) {
+      out = out.concat(c.pages.filter(function (p) { return p.sec === s; }));
+    });
+    /* 知らない sec が来ても落とさない（原本の順で末尾に付ける） */
+    c.pages.forEach(function (p) { if (out.indexOf(p) < 0) out.push(p); });
+    return out;
+  }
   function thumbOf(issue) {
     var c = content(issue);
     if (!c || !c.pages.length) return null;
@@ -98,7 +116,8 @@
         '<figcaption class="page-cap">' +
           (p.sub ? '<span class="wk">' + esc(p.sub) + "</span>" : "") +
           '<span class="ttl">' + esc(p.title) + "</span>" +
-          '<span class="page-hint">📖 タップでよむ</span>' +
+          /* 見た目の誘導文。button の aria-label と同じ内容が二重に読まれるので隠す */
+          '<span class="page-hint" aria-hidden="true">📖 タップでよむ</span>' +
         "</figcaption>" +
         '<button type="button" class="page-view' + (cropped ? " is-crop" : "") + '" ' +
                 'data-open="' + idx + '" aria-label="' + esc(alt) + ' をよむ"' + style + ">" +
@@ -121,21 +140,22 @@
           : "まだ用意ができていません。") +
         "</span></p>";
     }
-    var flat = c.pages;
-    var cover = flat.filter(function (p) { return p.sec === "cover"; })[0];
+    /* data-open は「画面に出す順」での位置。ビューアも同じ並びを使います */
+    var ord = orderedPages(issue);
+    var cover = ord.filter(function (p) { return p.sec === "cover"; })[0];
 
     var html = '<article class="issue">';
 
     html += '<header class="hero">' +
       '<p class="hero-kicker">' + esc(brand.name) + "</p>" +
-      '<h1 class="hero-title" aria-label="' + esc(issue.label) + '">' +
+      '<h1 class="hero-title" tabindex="-1" aria-label="' + esc(issue.label) + '">' +
         "<span>" + issue.year + "年</span>" +
         '<span class="num" aria-hidden="true">' + issue.month + "<small>月号</small></span>" +
       "</h1>";
     if (c["catch"]) html += '<p class="hero-catch">' + esc(c["catch"]) + "</p>";
     if (cover) {
       html += '<figure class="cover">' +
-        '<button type="button" data-open="' + flat.indexOf(cover) + '" ' +
+        '<button type="button" data-open="' + ord.indexOf(cover) + '" ' +
                 'aria-label="' + esc(issue.label) + 'をよむ">' +
         '<img src="' + esc(cover.src) + '" width="' + cover.w + '" height="' + cover.h + '" ' +
              'decoding="async" fetchpriority="high" alt="' + esc(issue.label) + "　" + esc(brand.name) + 'の表紙">' +
@@ -156,7 +176,7 @@
           '<span class="txt"><h2>' + SEC[s].name + "</h2>" +
           '<span class="cnt">' + SEC[s].lead + "　全" + list.length + "ページ</span></span>" +
         "</div>" +
-        list.map(function (p) { return pageHTML(p, flat.indexOf(p)); }).join("") +
+        list.map(function (p) { return pageHTML(p, ord.indexOf(p)); }).join("") +
       "</section>";
     });
 
@@ -179,8 +199,13 @@
     var items = summaryOf(issue);
     var has = !!content(issue);
     var alt = has ? null : otherBrandOf(issue);
+    /* その事業所で未発行の号は、カードに「▶ ◯◯くれよんで見る」と書いてある。
+       いままでは同じページで月だけ切り替わり、本文のリンクをもう一度押す必要があった。
+       書いてあるとおり、そのままもう一方の事業所のページへ渡す。 */
+    var jump = !has && alt;
     return '' +
-      '<a class="arch-card" href="#' + issue.id + '" data-issue="' + issue.id + '"' +
+      '<a class="arch-card" href="' + (jump ? esc(alt.href) : "") + "#" + issue.id + '"' +
+         (jump ? ' data-jump="1"' : ' data-issue="' + issue.id + '"') +
          (isNow ? ' aria-current="true"' : "") + ">" +
         '<span class="arch-thumb">' +
           (thumb
@@ -232,7 +257,23 @@
 
   var current = null;
 
+  /* 号の切り替えは画面をまるごと入れ替えるので、見ていない人には何も起きていないように
+     見える（title を変えても読み上げられない）。切り替わったことをここから伝える。 */
+  var liveStatus = document.createElement("p");
+  liveStatus.className = "sr-only";
+  liveStatus.setAttribute("role", "status");
+  document.body.appendChild(liveStatus);
+
   function apply(issue, opts) {
+    /* ビューアを開いたまま号が変わると（戻るボタンなど）、V.list は古い号のページを
+       指したまま残る。閉じるときに新しい号の別ページへ飛ぶので、先に閉じておく。
+       close イベントは非同期に飛ぶ＝後始末が入れ替え後に走ることがあるので、
+       「読んでいた場所へ戻す」だけは効かないようにしてから閉じる。 */
+    if (viewer && viewer.open) {
+      V.openAt = V.i;
+      closeViewer();
+      if (!viewer.close) cleanupViewer();
+    }
     current = issue.id;
     root.innerHTML = issueHTML(issue);
     archRoot.innerHTML = archiveHTML(issue.id);
@@ -241,6 +282,10 @@
     document.title = "月刊ぴあん " + issue.label + "｜" + brand.name;
     if (opts && opts.scroll) {
       window.scrollTo({ top: 0, behavior: "auto" });
+      /* 自分で選んで切り替えたときだけ。起動時に動かすとページの頭を飛ばしてしまう */
+      liveStatus.textContent = issue.label + "を ひらきました";
+      var h = root.querySelector(".hero-title");
+      if (h) h.focus({ preventScroll: true });
     }
     curTab = null;
     updateSpy();
@@ -322,6 +367,8 @@
     if (e.target === sheet) closeModal(sheet);
     var card = e.target.closest ? e.target.closest(".arch-card") : null;
     if (card) {
+      /* 他事業所へ渡すカードは、そのまま href に任せる */
+      if (card.getAttribute("data-jump")) { closeModal(sheet); return; }
       e.preventDefault();
       closeModal(sheet);
       location.hash = card.getAttribute("data-issue");
@@ -419,22 +466,39 @@
     }
   }
 
-  /* パンの可動範囲。soft>0 のときは範囲外にゴムのような抵抗をつける */
+  /* 拡大の下限。ここを下回ったら指を離した時点で元の大きさに戻す。
+     1本指のパン判定（V.s > 1.02）と揃えておかないと、1.02〜1.05 のあいだで
+     「スワイプもパンも効かず、ダブルタップも戻らない」わなができる。 */
+  var ZOOM_KEEP = 1.06, ZOOM_MAX = 4;
+
+  /* パンの可動範囲。soft>0 のときは範囲外にゴムのような抵抗をつける。
+     戻り値はどちらの軸が端に当たったか（慣性を軸ごとに止めるのに使う） */
+  var panHit = { x: false, y: false };
   function clampPan(soft) {
-    if (!V.fit) return false;
+    panHit.x = false; panHit.y = false;
+    if (!V.fit) return panHit;
     var r = stageRect();
     var fw = V.fit.w * V.s, fh = V.fit.h * V.s;
     var minX = Math.min((r.width - fw) / 2, r.width - fw), maxX = Math.max((r.width - fw) / 2, 0);
     var minY = Math.min((r.height - fh) / 2, r.height - fh), maxY = Math.max((r.height - fh) / 2, 0);
-    var hit = false;
-    function pull(v, lo, hi) {
-      if (v < lo) { hit = true; return soft ? lo + (v - lo) * soft : lo; }
-      if (v > hi) { hit = true; return soft ? hi + (v - hi) * soft : hi; }
+    function pull(v, lo, hi, ax) {
+      if (v < lo) { panHit[ax] = true; return soft ? lo + (v - lo) * soft : lo; }
+      if (v > hi) { panHit[ax] = true; return soft ? hi + (v - hi) * soft : hi; }
       return v;
     }
-    V.tx = pull(V.tx, minX, maxX);
-    V.ty = pull(V.ty, minY, maxY);
-    return hit;
+    V.tx = pull(V.tx, minX, maxX, "x");
+    V.ty = pull(V.ty, minY, maxY, "y");
+    return panHit;
+  }
+
+  /* 指が全部離れたときに倍率を落ちつかせる。何かしたら true。
+     ピンチの終わりは必ず「2本 → 1本 → 0本」で、1本になった時点で G が pan に
+     差し替わるため、以前 pinch 分岐の中にあったこの処理は一度も実行されず、
+     0.55 まで縮んだまま／5 倍のまま戻らなくなっていた。 */
+  function settleZoom() {
+    if (V.s < ZOOM_KEEP) { resetZoom(); applyZoom(true); return true; }
+    if (V.s > ZOOM_MAX) { V.s = ZOOM_MAX; clampPan(0); applyZoom(true); return true; }
+    return false;
   }
 
   function setTrack(dx, dy, anim) {
@@ -442,21 +506,45 @@
     vTrack.style.transform = "translate3d(calc(" + (-V.i * 100) + "% + " + dx + "px)," + dy + "px,0)";
   }
 
+  /* フォーカスの乗っているボタンを disabled にすると、ブラウザはフォーカスを外して
+     body へ落とす。keydown は #viewer に張ってあるので、そうなると矢印キーが
+     まるごと効かなくなる（◀ で1ページ目、▶ で最終ページへ行った人が必ず踏む）。
+     無効にする前に、隣のボタンへ逃がしておく。 */
+  function setNavDisabled(btn, off) {
+    if (off && !btn.disabled && document.activeElement === btn) {
+      var alt = btn === vNext ? vPrev : vNext;
+      (alt.disabled ? vClose : alt).focus({ preventScroll: true });
+    }
+    btn.disabled = off;
+  }
+
+  var chromeAt = -1;
   function updateChrome() {
     var p = V.list[V.i];
-    vTitle.innerHTML = '<span class="v-issue">' + esc(V.label) + "</span>" + esc(p.title);
-    var col = (SEC[p.sec] || {}).color || "#c78fc8";
-    vPos.innerHTML =
-      '<span class="v-pn"><span class="v-dot" style="background:' + col + '"></span>' +
-      (V.i + 1) + " / " + V.list.length + "</span>" +
-      '<span class="v-pt">' + esc(p.sub ? p.sub : p.title) + "</span>";
-    vPrev.disabled = V.i === 0;
-    vNext.disabled = V.i === V.list.length - 1;
+    /* vPos は aria-live。同じページのまま書き直すと同じ内容が読み上げ直されるので、
+       ページが変わったときだけ作り直す（スワイプが届かず戻ったときも goTo は走る） */
+    if (chromeAt !== V.i) {
+      chromeAt = V.i;
+      vTitle.innerHTML = '<span class="v-issue">' + esc(V.label) + "</span>" + esc(p.title);
+      var col = (SEC[p.sec] || {}).color || "#c78fc8";
+      vPos.innerHTML =
+        '<span class="v-pn"><span class="v-dot" style="background:' + col + '"></span>' +
+        (V.i + 1) + " / " + V.list.length + "</span>" +
+        '<span class="v-pt">' + esc(p.sub ? p.sub : p.title) + "</span>";
+    }
+    setNavDisabled(vPrev, V.i === 0);
+    setNavDisabled(vNext, V.i === V.list.length - 1);
   }
 
   function goTo(i, anim) {
     stopInertia();
     V.i = clamp(i, 0, V.list.length - 1);
+    /* 見えていないページも DOM には全部いる。transform で外へ出しているだけなので、
+       そのままだと読み上げに全ページぶんの画像名が並んで、どれが今なのか分からない */
+    for (var k = 0; k < V.cells.length; k++) {
+      if (k === V.i) V.cells[k].el.removeAttribute("aria-hidden");
+      else V.cells[k].el.setAttribute("aria-hidden", "true");
+    }
     V.fit = null;
     layoutCell(V.i);
     resetZoom();
@@ -472,7 +560,9 @@
     var issue = findIssue(current);
     var c = content(issue);
     if (!c) return;
-    V.list = c.pages;
+    /* 縦スクロール面と同じ並び。data-open の番号もこの配列の位置です */
+    V.list = orderedPages(issue);
+    if (!V.list.length) return;
     V.label = issue.label + "　" + brand.name;
     V.openAt = clamp(idx || 0, 0, V.list.length - 1);
     buildCells();
@@ -485,10 +575,19 @@
     for (var j = 0; j < V.cells.length; j++) layoutCell(j);
     goTo(V.openAt, false);
     vClose.focus({ preventScroll: true });
-    if (!localStorage.getItem("pian_vhint")) {
-      localStorage.setItem("pian_vhint", "1");
+    /* localStorage は使えない環境がある（Safari のプライベート等）。diaryDot と同じ扱いに */
+    var firstTime = false;
+    try {
+      if (!window.localStorage.getItem("pian_vhint")) {
+        window.localStorage.setItem("pian_vhint", "1");
+        firstTime = true;
+      }
+    } catch (e) { /* 出さないだけ */ }
+    if (firstTime) {
       setTimeout(function () { vHint.hidden = false; vHint.classList.add("show"); }, 350);
       setTimeout(function () { vHint.classList.remove("show"); }, 3400);
+      /* hidden に戻さないと、消えたあとも読み上げにだけ残り続ける */
+      setTimeout(function () { vHint.hidden = true; }, 3800);
     }
   }
 
@@ -502,10 +601,21 @@
   function cleanupViewer() {
     lockScroll(false);
     stopInertia();
-    /* とじたとき、最後によんでいたページへ縦スクロール面を合わせる */
+    /* 指の状態を持ち越さない。残っていると次に開いたとき最初のタッチが効かない */
+    ptrs.clear();
+    G = null;
+    chromeAt = -1;
+    viewer.style.opacity = "";
+    /* とじたとき、最後によんでいたページへ縦スクロール面を合わせる。
+       フォーカスも一緒に移す。<dialog> は「開く前に押したページ」へ戻すので、
+       読みすすめたぶんだけ、見えている場所とフォーカスがずれてしまう。 */
     if (V.i !== V.openAt) {
       var target = root.querySelector('.page[data-idx="' + V.i + '"]');
-      if (target) target.scrollIntoView({ block: "center", behavior: "auto" });
+      if (target) {
+        target.scrollIntoView({ block: "center", behavior: "auto" });
+        var btn = target.querySelector(".page-view");
+        if (btn) btn.focus({ preventScroll: true });
+      }
     }
     vTrack.innerHTML = "";
     V.cells = [];
@@ -545,13 +655,19 @@
     if (Math.hypot(vx, vy) < 0.08 || prefersStill()) return;
     var last = performance.now();
     function step() {
-      var now = performance.now(), dt = now - last; last = now;
+      /* 裏のタブでは rAF が止まる。戻ってきた1フレーム目の dt が巨大になると
+         一気に端まで飛ぶので、頭打ちにする */
+      var now = performance.now(), dt = Math.min(32, now - last); last = now;
       V.tx += vx * dt; V.ty += vy * dt;
       var decay = Math.pow(0.94, dt / 16);
       vx *= decay; vy *= decay;
       var hit = clampPan(0);
+      /* 端に当たった軸だけ止める。以前は片方が当たると両方止まり、
+         斜めに流したときに縦がその場で死んでいた */
+      if (hit.x) vx = 0;
+      if (hit.y) vy = 0;
       applyZoom(false);
-      inertia = (Math.hypot(vx, vy) > 0.02 && !hit) ? requestAnimationFrame(step) : null;
+      inertia = Math.hypot(vx, vy) > 0.02 ? requestAnimationFrame(step) : null;
     }
     inertia = requestAnimationFrame(step);
   }
@@ -571,6 +687,7 @@
       G = { type: "pinch", d0: dist(a[0], a[1]), mid0: mid(a[0], a[1]),
             s0: V.s, tx0: V.tx, ty0: V.ty };
       setTrack(0, 0, false);
+      viewer.style.opacity = ""; /* 下スワイプの途中でピンチに移ると薄いまま残る */
     }
   });
 
@@ -627,6 +744,15 @@
     ptrs.delete(e.pointerId);
 
     if (G && G.type === "pinch") {
+      if (ptrs.size >= 2) {
+        /* 3本目を離した。残った2本でピンチを組み直す。
+           以前はここで G を捨てていたので、指が2本残っているのに
+           以降ピンチが完全に無反応になっていた */
+        var a2 = Array.from(ptrs.values());
+        G = { type: "pinch", d0: dist(a2[0], a2[1]), mid0: mid(a2[0], a2[1]),
+              s0: V.s, tx0: V.tx, ty0: V.ty };
+        return;
+      }
       if (ptrs.size === 1) {
         var rest = Array.from(ptrs.values())[0];
         G = { type: "pan", x0: rest.x, y0: rest.y, t0: 0, moved: 99, axis: null,
@@ -634,9 +760,7 @@
               lastX: rest.x, lastY: rest.y, lastT: performance.now(), vx: 0, vy: 0 };
         return;
       }
-      /* 全部の指が離れた：倍率を落ちつかせる */
-      if (V.s < 1.02) { resetZoom(); applyZoom(true); }
-      else { V.s = clamp(V.s, 1, 4); clampPan(0); applyZoom(true); }
+      settleZoom();
       G = null;
       return;
     }
@@ -644,7 +768,16 @@
     if (!G) return;
     var g = G; G = null;
 
-    if (g.type === "pan") { clampPan(0); applyZoom(true); startInertia(g.vx, g.vy); return; }
+    if (g.type === "pan") {
+      /* ピンチから1本になった経路もここに来る。倍率の後始末はここでやる */
+      if (settleZoom()) return;
+      var hit = clampPan(0);
+      applyZoom(true);
+      /* ゴムで引っぱった位置から戻すときに慣性を走らせると、その1フレーム目が
+         transition:"none" を書いてしまい、.28s のもどりが一度も再生されない */
+      if (!hit.x && !hit.y) startInertia(g.vx, g.vy);
+      return;
+    }
     if (g.type === "track") {
       var W = stageRect().width;
       if (g.dx < -W * 0.2 || g.vx < -0.5) goTo(V.i + 1, true);
@@ -653,13 +786,18 @@
       return;
     }
     if (g.type === "close") {
-      if (g.dy > 110 || g.vy > 0.6) { closeViewer(); if (!viewer.close) cleanupViewer(); }
+      if (g.dy > 110 || g.vy > 0.6) {
+        /* 先に戻さないと、インラインの opacity が .viewer:not([open]){opacity:0} に
+           勝って、閉じるあいだ薄いまま居座る */
+        viewer.style.opacity = "";
+        closeViewer(); if (!viewer.close) cleanupViewer();
+      }
       else { viewer.style.opacity = ""; setTrack(0, 0, true); }
       return;
     }
     /* タップ（シングル=バー表示切替 / ダブル=拡大） */
     var dur = performance.now() - g.t0;
-    if (g.moved < 10 && dur < 320) {
+    if (g.moved < 10 && dur < 800) {
       var now = performance.now();
       if (now - lastTap < 320 && lastTapXY && Math.hypot(g.x0 - lastTapXY.x, g.y0 - lastTapXY.y) < 32) {
         lastTap = 0; lastTapXY = null;
@@ -679,7 +817,7 @@
   vStage.addEventListener("pointercancel", onPointerEnd);
 
   function dblTap(x, y) {
-    if (V.s > 1.05) { resetZoom(); applyZoom(true); return; }
+    if (V.s > ZOOM_KEEP) { resetZoom(); applyZoom(true); return; }
     var s2 = 2.5;
     V.tx = x - (x - V.tx) * (s2 / V.s);
     V.ty = y - (y - V.ty) * (s2 / V.s);
@@ -715,7 +853,7 @@
   /* 縦スクロール面のバックナンバー（シートと同じカード） */
   archRoot.addEventListener("click", function (e) {
     var card = e.target.closest ? e.target.closest(".arch-card") : null;
-    if (card) {
+    if (card && !card.getAttribute("data-jump")) {
       e.preventDefault();
       location.hash = card.getAttribute("data-issue");
     }

@@ -63,9 +63,15 @@ def pdf_for(brand: str, ym: str) -> Path:
 def render_pdf_to_pngs(pdf: Path, workdir: Path) -> list[Path]:
     """pdftoppm でPDFを1ページずつPNGに書き出す。"""
     prefix = workdir / "pg"
-    subprocess.run(
-        ["pdftoppm", "-png", "-r", str(RENDER_DPI), str(pdf), str(prefix)], check=True
-    )
+    try:
+        subprocess.run(
+            ["pdftoppm", "-png", "-r", str(RENDER_DPI), str(pdf), str(prefix)], check=True
+        )
+    except subprocess.CalledProcessError as e:
+        raise SystemExit(
+            f"PDFを開けませんでした: {pdf.name}（pdftoppm 終了コード {e.returncode}）\n"
+            "（原本が壊れていないか、ほかのアプリで開いたままになっていないか確認してください）"
+        ) from None
     # pdftoppm はページ数の桁数に合わせてゼロ埋めするので、名前を仮定せず
     # 実際に出来たファイルを数値順に並べ直す。
     pngs = sorted(
@@ -97,6 +103,7 @@ def make_thumb(src: Path, dst: Path) -> dict:
         left = max(0, (im.width - side) // 2)
         im = im.crop((left, 0, left + side, side))
         im = im.resize((THUMB_SIZE, THUMB_SIZE), Image.LANCZOS)
+        dst.parent.mkdir(parents=True, exist_ok=True)
         im.save(dst, "WEBP", quality=THUMB_QUALITY, method=6)
         return {"w": THUMB_SIZE, "h": THUMB_SIZE, "kb": round(dst.stat().st_size / 1024)}
 
@@ -114,6 +121,18 @@ def convert(pdf: Path, brand: str, ym: str, out_root: Path, repo: Path, thumb_pa
                 "w": meta["w"], "h": meta["h"],
                 "kb": round(dst.stat().st_size / 1024),
             })
+
+    # ページ数が減る作り直し（8→4ページ等）では古い p5..p8 が残り、issues.js から
+    # 参照されないまま公開・キャッシュされ続ける。消すかは運用判断なので必ず知らせる。
+    stale = []
+    for f in sorted(out_dir.glob("p*.webp")):
+        mm = re.fullmatch(r"p(\d+)\.webp", f.name)
+        if mm and int(mm.group(1)) > len(pages):
+            stale.append(f.name)
+    if stale:
+        print("※ 前回より少ないページ数です。使われないファイルが残っています: "
+              + ", ".join(stale)
+              + "（issues.js から参照しないなら削除してください）", file=sys.stderr)
 
     tp = min(max(thumb_page, 1), len(pages))
     thumb_dst = out_dir / "thumb.webp"
@@ -136,6 +155,15 @@ def convert(pdf: Path, brand: str, ym: str, out_root: Path, repo: Path, thumb_pa
 
 
 def main() -> int:
+    # 保管場所のパスに含まれる「⓪」は cp932 に無い文字。出力をファイルやパイプに
+    # 流すと、最後のJSON出力だけが UnicodeEncodeError で落ちる（画像は出来ているのに
+    # 「失敗した」と見える）。先に UTF-8 に切り替えておく。
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8", errors="replace")
+        except (AttributeError, ValueError):
+            pass
+
     ap = argparse.ArgumentParser(description="月刊ぴあんPDF → WebPページ画像")
     ap.add_argument("--ym", required=True, help="号（例: 2026-09）")
     ap.add_argument("--brand", choices=sorted(BRANDS), default=None,
@@ -147,26 +175,32 @@ def main() -> int:
                     help="バックナンバー一覧の見本にするページ番号（既定: 1＝表紙）")
     args = ap.parse_args()
 
-    if not re.fullmatch(r"\d{4}-\d{2}", args.ym):
-        raise SystemExit("--ym は 2026-09 の形式で指定してください")
+    # \d は全角数字（２０２６）にも一致してしまう。通すと原本は見つかるのに
+    # 出力先だけ images/２０２６-０９/ になり、sw.js のキャッシュ判定からも外れる。
+    if not re.fullmatch(r"[0-9]{4}-(0[1-9]|1[0-2])", args.ym):
+        raise SystemExit("--ym は 2026-09 の形式（半角、月は 01〜12）で指定してください")
     if not shutil.which("pdftoppm"):
         raise SystemExit("pdftoppm が見つかりません。poppler をインストールしてください。")
 
     repo = Path(__file__).resolve().parent.parent
-    out_root = Path(args.out) if args.out else repo / "images"
+    out_root = Path(args.out).expanduser().resolve() if args.out else repo / "images"
+    if not out_root.is_relative_to(repo):
+        print(f"※ 出力先がリポジトリの外です（{out_root}）。表示される src は絶対パスに\n"
+              "  なるので、そのままでは issues.js に貼れません。", file=sys.stderr)
     brands = [args.brand] if args.brand else list(BRANDS)
 
     if args.pdf and not args.brand:
         raise SystemExit("--pdf を使うときは --brand も指定してください")
 
-    # 先に全部の在りかを確かめてから変換する（途中で片方だけ出来る事故を防ぐ）
+    # 先に全部の在りかを確かめる。ファイルが無い場合の空振りは防げるが、
+    # 変換の途中で失敗すれば片方だけ出来上がる（そのときは同じ月をもう一度回す）
     targets = []
     for b in brands:
         p = Path(args.pdf).expanduser() if args.pdf else pdf_for(b, args.ym)
         if not p.exists():
             raise SystemExit(
                 f"PDFが見つかりません: {p}\n"
-                f"（保管場所に置いてあるか、ファイル名が「{BRANDS[b]['pdf'].format(y=2026, m=9)}」の形か確認してください）"
+                f"（保管場所に置いてあるか、ファイル名が「{BRANDS[b]['pdf'].format(y=int(args.ym[:4]), m=int(args.ym[5:]))}」の形か確認してください）"
             )
         targets.append((b, p))
 

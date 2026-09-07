@@ -1,6 +1,6 @@
 {
   "name": "月刊ぴあん（あとりえくれよん）",
-  "short_name": "月刊ぴあん",
+  "short_name": "ぴあん あとりえ",
   "description": "あとりえくれよんの月刊ぴあん。今月号とバックナンバー。",
   "start_url": "index.html",
   "scope": ".",

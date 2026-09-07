@@ -1018,6 +1018,19 @@ body.diary-page{
   /* 広い画面では移植元どおり左のサイドバーに出す（.dd-layout と同じ境目）。
      畳む枠のほうは素通しにして、中の .dd-toc をそのまま見せる */
   .dd-toc-fold{ border:0; background:none; }
-  .dd-toc-fold > summary{ display:none; }
-  .dd-toc-fold .dd-toc{ padding:0; }
+  /* summary は消さない。消すと、もくじを畳んだまま画面を広げた人（iPad を横に回す等）が
+     開き直す手がかりを失う。広い画面では小さな見出しとして置く */
+  .dd-toc-fold > summary{
+    padding:0 0 .4rem; font-size:.78rem; letter-spacing:.04em; color:var(--dd-ink-2);
+  }
+  .dd-toc-fold .dd-toc{
+    padding:0;
+    /* 上の .dd-toc-fold .dd-toc{position:static} はメディアクエリの外にあり、
+       詳細度で移植元の .dd-toc{position:sticky} に勝つため、どの画面幅でも
+       貼り付かなくなっていた。広い画面では移植元どおり sticky に戻す。
+       いま読んでいる記事を目次で光らせる仕掛け（assets/diary.js の spy）は
+       目次が画面に残っていて初めて意味を持つ。 */
+    position:sticky; top:5.5rem;
+    max-height:calc(100dvh - 7rem); overflow:auto;
+  }
 }

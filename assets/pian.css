@@ -58,6 +58,9 @@ body[data-brand="nijiiro"]{
 html{
   scroll-behavior:smooth;
   scroll-padding-top:14px;
+  /* 固定されているのは下のドック。Tab でページを辿るとき、フォーカスした
+     ボタンがドックの裏に隠れないよう body と同じぶん空けておく */
+  scroll-padding-bottom:calc(var(--dock-h) + 26px + env(safe-area-inset-bottom,0px));
   -webkit-text-size-adjust:100%;
 }
 
@@ -104,10 +107,18 @@ a{color:var(--brand-d);}
 }
 .skip:focus{left:0;}
 
+/* 目には見えないが読み上げには届く。号を切り替えたことの通知に使う */
+.sr-only{
+  position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0;
+}
+
 .wrap{
   position:relative; z-index:1;
   width:100%; max-width:680px; margin:0 auto;
-  padding:0 14px;
+  /* 横向きのとき、ノッチや角丸に文字が入らないようにする（viewport-fit=cover のため） */
+  padding:0 calc(14px + env(safe-area-inset-right,0px))
+          0 calc(14px + env(safe-area-inset-left,0px));
 }
 
 /* ══════════ 読みすすみバー（上端） ══════════ */
@@ -269,9 +280,15 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
   display:flex; align-items:center; flex-wrap:wrap; gap:8px;
   margin:0 0 9px; padding-left:2px;
 }
+/* マステの文字は濃いインク色にする。白文字だと実測コントラストが
+   schedule 2.03 / subject 2.32 / meditation 3.31 / main 2.10 / other 2.09 と
+   AA(4.5:1) を全色下回る。11.5px の「①週目」は飾りではなく読ませる情報なので、
+   #241f1b（prefers-contrast:more の --ink と同値）に。順に 8.04 / 7.02 / 4.94 /
+   7.78 / 7.80 で全色通過する。**マステの色は1つも変えていない**。
+   assets/diary.css の .dd-tape と同じ判断。 */
 .page-cap .wk{
   display:inline-block; padding:3px 11px; border-radius:3px;
-  font-size:11.5px; letter-spacing:.04em; color:#fff;
+  font-size:11.5px; letter-spacing:.04em; color:#241f1b;
   transform:rotate(-1deg); opacity:.92;
 }
 .sec[data-sec="schedule"] .wk{background:var(--c-schedule);}
@@ -442,10 +459,12 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
   font-family:var(--font-head); font-size:12px; color:var(--brand-d);
   background:rgba(255,255,255,.95); border:2px solid var(--brand);
   border-radius:999px; box-shadow:0 4px 14px rgba(120,105,90,.22);
-  opacity:0; transform:translateY(10px); pointer-events:none;
-  transition:opacity .25s ease-out, transform .25s ease-out;
+  /* visibility も落とす。opacity:0 だけだと、見えていないのに Tab で
+     フォーカスが入り、読み上げにも出てしまう */
+  opacity:0; visibility:hidden; transform:translateY(10px); pointer-events:none;
+  transition:opacity .25s ease-out, transform .25s ease-out, visibility .25s;
 }
-.totop.on{opacity:1; transform:none; pointer-events:auto;}
+.totop.on{opacity:1; visibility:visible; transform:none; pointer-events:auto;}
 
 /* ══════════ フッター ══════════ */
 .foot{
@@ -463,11 +482,16 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 }
 
 /* ══════════ ドック（画面下の操作バー） ══════════ */
+/* JS が動かなかったとき（issues.js の読み込み失敗など）に空のバーが残らないよう、
+   HTML の hidden を効かせる。display:flex は [hidden]{display:none} に勝つため。 */
+.dock[hidden]{display:none;}
 .dock{
   position:fixed; left:0; right:0; bottom:0; z-index:50;
   display:flex; align-items:center; gap:8px;
   min-height:var(--dock-h);
-  padding:8px 10px calc(8px + env(safe-area-inset-bottom,0px));
+  padding:8px calc(10px + env(safe-area-inset-right,0px))
+          calc(8px + env(safe-area-inset-bottom,0px))
+          calc(10px + env(safe-area-inset-left,0px));
   background:rgba(255,250,244,.92);
   -webkit-backdrop-filter:blur(14px) saturate(1.3);
   backdrop-filter:blur(14px) saturate(1.3);
@@ -552,7 +576,9 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 /* ══════════ ページビューア（フルスクリーン） ══════════ */
 .viewer{
   border:0; padding:0; margin:0;
-  width:100vw; height:100dvh; max-width:none; max-height:none;
+  /* dvh 非対応（Safari 15.3 以前など）では height ごと捨てられ、dialog の既定
+     height:fit-content に戻って中身が潰れる。先に vh を置いて受け止める */
+  width:100vw; height:100vh; height:100dvh; max-width:none; max-height:none;
   background:#221e1b; color:#fff;
   overflow:hidden;
   opacity:1;
@@ -640,8 +666,10 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 }
 
 /* 没入モード（単タップでバーを隠す） */
-.viewer.ui-hide .v-top{opacity:0; transform:translateY(-12px); pointer-events:none;}
-.viewer.ui-hide .v-bottom{opacity:0; transform:translateY(12px); pointer-events:none;}
+/* 隠すときは visibility も落とす。opacity:0 だけだと、見えていないボタンに
+   Tab でフォーカスが入り、読み上げにも「✕ とじる ボタン」が残る */
+.viewer.ui-hide .v-top{opacity:0; visibility:hidden; transform:translateY(-12px); pointer-events:none;}
+.viewer.ui-hide .v-bottom{opacity:0; visibility:hidden; transform:translateY(12px); pointer-events:none;}
 
 .v-hint{
   position:absolute; left:50%; bottom:calc(96px + env(safe-area-inset-bottom,0px));
@@ -662,6 +690,7 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
 .issue .sec:nth-of-type(2){animation-delay:.08s;}
 .issue .sec:nth-of-type(3){animation-delay:.12s;}
 .issue .sec:nth-of-type(4){animation-delay:.16s;}
+.issue .sec:nth-of-type(5){animation-delay:.20s;} /* SEC_ORDER は5種。1つでも欠けると遅延0で先に出る */
 @keyframes rise{
   from{opacity:0; transform:translateY(10px);}
   to{opacity:1; transform:none;}
@@ -692,8 +721,17 @@ body[data-brand="nijiiro"] .brands a[aria-current="page"]{background:var(--brand
   body{background:#fff; padding-bottom:0;}
   body::before,.site,.progress,.dock,.sheet,.viewer,.read-start,
   .archive,.tools,.totop,.skip,.page-hint{display:none !important;}
+  /* 画面での操作説明は紙の上では意味を持たない */
+  .foot small{display:none !important;}
   .wrap{max-width:none; padding:0;}
   .issue,.issue .sec{animation:none;}
+  /* 事業所名と週ラベルは色地に白文字。印刷は既定で背景を落とすので、
+     このままだと白い紙に白い文字＝消える。地の色ごと刷る */
+  .hero-kicker,.page-cap .wk,.sec-head .ico{
+    -webkit-print-color-adjust:exact; print-color-adjust:exact;
+  }
+  /* 表紙も本文ページと同じく、見出しだけの紙が挟まらないようにする */
+  .cover{break-inside:avoid;}
   .page{margin:0 0 10mm; break-inside:avoid;}
   .page-view.is-crop{overflow:visible;}
   .page-view.is-crop img{aspect-ratio:auto; object-fit:fill;} /* 紙では省略せず全体を出す */

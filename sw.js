@@ -7,7 +7,7 @@
  *  - HTML / CSS / JS / issues.js / diary.js は毎回ネットワーク優先
  *    → 新しい号や日誌の記事を出したらすぐ全員に届く（キャッシュで古いまま、を防ぐ）
  */
-var VER = "pian-v1";
+var VER = "pian-v2";
 
 /* 圏外で、まだ一度も開いていないページを開いたときに出す紙。
    これが無いと caches.match が undefined を返し、respondWith が失敗して

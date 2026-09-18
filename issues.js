@@ -25,6 +25,42 @@ window.PIAN = {
   },
   issues: [
     {
+      id: "2026-10", year: 2026, month: 10,
+      label: "2026年10月号", short: "10月号",
+      brands: {
+        atelier: {
+          catch: "Trick or Treat！",
+          note: "",
+          thumb: {"src": "images/2026-10/atelier/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-10/atelier/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年10月号"},
+            {"src": "images/2026-10/atelier/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "ひらめけ！スピードしりとりバトル", "sub": "きょうかかだい ②〜⑤週目"},
+            {"src": "images/2026-10/atelier/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "てのひらポカポカリラックス", "sub": "めいそうかだい ②〜⑤週目"},
+            {"src": "images/2026-10/atelier/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "ただしいアイテムをすばやくキャッチ", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-10/atelier/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "マステでつくろう秋アート", "sub": "メインかだい ②週目"},
+            {"src": "images/2026-10/atelier/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "さいころふってミッションクリア！", "sub": "メインかだい ③週目"},
+            {"src": "images/2026-10/atelier/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "ふって！ねらって！ぞろめゲット！", "sub": "メインかだい ④〜⑤週目"},
+            {"src": "images/2026-10/atelier/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "10月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        },
+        nijiiro: {
+          catch: "Trick or Treat！",
+          note: "",
+          thumb: {"src": "images/2026-10/nijiiro/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-10/nijiiro/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年10月号"},
+            {"src": "images/2026-10/nijiiro/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "すうじをよそうしてただしくならべよう！", "sub": "きょうかかだい ②〜⑤週目"},
+            {"src": "images/2026-10/nijiiro/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "あたまの中であきあそび", "sub": "めいそうかだい ②〜⑤週目"},
+            {"src": "images/2026-10/nijiiro/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "おとすな！ゆらすな！たまのせバトル！", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-10/nijiiro/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "さいころふってミッションクリア！", "sub": "メインかだい ②週目"},
+            {"src": "images/2026-10/nijiiro/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "ふたりでつくるカメレオンアート", "sub": "メインかだい ③週目"},
+            {"src": "images/2026-10/nijiiro/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "マステでつくろう秋アート", "sub": "メインかだい ④〜⑤週目"},
+            {"src": "images/2026-10/nijiiro/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "10月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        }
+      }
+    },
+    {
       id: "2026-09", year: 2026, month: 9,
       label: "2026年9月号", short: "9月号",
       brands: {

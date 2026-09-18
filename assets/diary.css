@@ -964,8 +964,43 @@
 /* 書体。移植元は next/font で自ホストしていたが、ここは素のHTMLなので
    diary.html の <link> で Google Fonts から読む。変数名は移植元と同じ。 */
 .dd-root{
-  --dd-font-round:"Zen Maru Gothic","Hiragino Maru Gothic ProN";
-  --dd-font-body:"Zen Kaku Gothic New","Hiragino Sans","BIZ UDPGothic";
+  --dd-font-round:"Kosugi Maru","Zen Maru Gothic","Hiragino Maru Gothic ProN";
+  --dd-font-body:"Noto Sans JP","BIZ UDPGothic","Hiragino Sans";
+
+  /* ── デザインシステム「ちょいマステ」v2 への寄せ ──────────────────
+     移植元（sougei-system の dev-diary.css）の955行は1文字も直さずに、
+     そこで定義されている --dd-* を**ここで上書きする**ことで見た目だけを差し替える。
+     同じ .dd-root セレクタで後から書いているので、詳細度を上げずに勝てる。
+     移植元と分岐させないための逃げ道でもあり、向こうを直す気になったら
+     このブロックを消せば元の色に戻る。
+     ・紙と文字：純白をやめてクラフト紙＋ほぼ黒（薄い灰色の文字を作らない）
+     ・色つきの文字は7色の「濃色」、下地はパステルの淡い塗り            */
+  --dd-paper:     #F3EDE4;   /* ページ地：クラフト紙 */
+  --dd-cream:     #EDE4D7;
+  --dd-card:      #FBF7F1;   /* カード：画用紙（#fffefc の純白をやめる） */
+  --dd-ink:       #1F1B19;   /* 本文：ほぼ黒の茶 */
+  --dd-ink-2:     #4A433D;   /* 補足 */
+  --dd-ink-3:     #7A7269;   /* 下書き線（本文には使わない） */
+  --dd-line:      #D9CFC2;
+  --dd-line-2:    #D9CFC2;
+
+  --dd-violet:    var(--m-indigo-ink);
+  --dd-violet-bg: color-mix(in srgb, var(--m-indigo) 12%, var(--dd-card));
+  --dd-green:     var(--m-green-ink);
+  --dd-green-bg:  color-mix(in srgb, var(--m-green) 12%, var(--dd-card));
+  --dd-orange:    var(--m-orange-ink);
+  --dd-orange-bg: color-mix(in srgb, var(--m-orange) 12%, var(--dd-card));
+  --dd-yellow:    var(--m-yellow);
+  --dd-rose:      var(--m-red-ink);
+  --dd-rose-bg:   color-mix(in srgb, var(--m-red) 12%, var(--dd-card));
+
+  --dd-maste-gray:#D9CFC2;
+  --dd-gray:      #4A433D;
+  --dd-gray-bg:   #EDE4D7;
+  --dd-gray-soft: #E2D9CC;
+  --dd-rail:      #D9CFC2;
+  --dd-mat:       #EDE4D7;
+  --dd-mat-line:  #D9CFC2;
 
   /* 外枠。移植元は <main class="p-4"> の内側だったので margin:-1rem で
      それを打ち消していた。ここは body 直下なので打ち消しは要らない。 */
@@ -980,7 +1015,7 @@
    月刊ぴあん本体の背景（大きな色の丸）が半端に残り、継ぎ目が目立つ。 */
 body.diary-page{
   padding-bottom:0;
-  background:#f3ede4;
+  background:var(--paper);
 }
 
 /* もどる導線（日誌ページのヘッダー） */
@@ -990,9 +1025,9 @@ body.diary-page{
 .diary-back a{
   display:inline-flex; align-items:center; gap:6px;
   min-height:44px; padding:0 16px;
-  font-family:var(--font-head); font-size:13px; text-decoration:none;
-  color:var(--brand-d); background:rgba(255,255,255,.9);
-  border:2px solid var(--brand); border-radius:999px;
+  font-family:var(--font-head); font-weight:700; font-size:14px; text-decoration:none;
+  color:var(--ink); background:var(--card);
+  border:2px solid var(--brand-ink); border-radius:var(--radius-btn);
 }
 
 /* スマホでは目次を畳む。移植元は 1080px 超でサイドバーに出る作りで、

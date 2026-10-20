@@ -25,6 +25,42 @@ window.PIAN = {
   },
   issues: [
     {
+      id: "2026-11", year: 2026, month: 11,
+      label: "2026年11月号", short: "11月号",
+      brands: {
+        atelier: {
+          catch: "おいしい きせつ",
+          note: "11月3日・23日はお休みです。",
+          thumb: {"src": "images/2026-11/atelier/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-11/atelier/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年11月号"},
+            {"src": "images/2026-11/atelier/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "ウボンゴ", "sub": "きょうかかだい ①〜⑤週目"},
+            {"src": "images/2026-11/atelier/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "かおりでホッとタイム", "sub": "めいそうかだい ①〜⑤週目"},
+            {"src": "images/2026-11/atelier/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "おめめをきたえよう選手権", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-11/atelier/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "さかな（組み立てと写真撮影・図鑑作り）", "sub": "メインかだい ②〜③週目"},
+            {"src": "images/2026-11/atelier/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "キャプテン・リノ", "sub": "メインかだい ④週目"},
+            {"src": "images/2026-11/atelier/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "イラスト（クリスマス）", "sub": "メインかだい ⑤週目"},
+            {"src": "images/2026-11/atelier/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "11月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        },
+        nijiiro: {
+          catch: "おいしい きせつ",
+          note: "11月3日はお休みです。",
+          thumb: {"src": "images/2026-11/nijiiro/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-11/nijiiro/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年11月号"},
+            {"src": "images/2026-11/nijiiro/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "ワードバスケット", "sub": "きょうかかだい ①〜④週目"},
+            {"src": "images/2026-11/nijiiro/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "はくしゅでホッとタイム", "sub": "めいそうかだい ①〜④週目"},
+            {"src": "images/2026-11/nijiiro/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "おばけキャッチ", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-11/nijiiro/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "センサリーボトル", "sub": "メインかだい ②週目"},
+            {"src": "images/2026-11/nijiiro/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "みんなの怒りスイッチをさがせ！", "sub": "メインかだい ③週目"},
+            {"src": "images/2026-11/nijiiro/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "怒り方マスターになろう", "sub": "メインかだい ④週目"},
+            {"src": "images/2026-11/nijiiro/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "11月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        }
+      }
+    },
+    {
       id: "2026-10", year: 2026, month: 10,
       label: "2026年10月号", short: "10月号",
       brands: {

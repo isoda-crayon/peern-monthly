@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+JP:wght@500;700&family=Yomogi&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/pian.css" />
+<link rel="stylesheet" href="assets/pian.css?v=mobile-1" />
 </head>
 <body data-brand="atelier">
 
@@ -43,6 +43,7 @@
 
 <main id="main" class="wrap">
 
+  <div id="resumeCard" hidden></div>
   <div id="issueRoot"></div>
 
   <noscript>
@@ -84,8 +85,16 @@
 <dialog class="sheet" id="issueSheet" aria-labelledby="sheetTitle">
   <div class="sheet-body">
     <div class="sheet-grip" aria-hidden="true"></div>
-    <h2 id="sheetTitle">📚 号をえらぶ</h2>
-    <p class="sheet-lead">見たい月を タップしてください</p>
+    <div class="sheet-heading">
+      <div><p class="shelf-kicker">ぴあんの 本だな</p><h2 id="sheetTitle">課題・号をさがす</h2></div>
+      <button type="button" class="sheet-close" id="sheetClose" autofocus>✕ とじる</button>
+    </div>
+    <div class="search-tools">
+      <label for="issueSearch">課題名・年月でさがす</label>
+      <div class="search-row"><input id="issueSearch" type="search" placeholder="例：うちわ、2026年11月…" autocomplete="off" /><button type="button" id="searchClear" aria-label="検索条件をクリア">クリア</button></div>
+      <div class="search-meta"><label for="issueYear">発行年</label><select id="issueYear"><option value="">すべての年</option></select><span id="searchCount" role="status" aria-live="polite"></span></div>
+    </div>
+    <div id="sheetResults" hidden></div>
     <div class="sheet-grid" id="sheetGrid"></div>
   </div>
 </dialog>
@@ -93,15 +102,22 @@
 <dialog class="viewer" id="viewer" aria-label="ページをよむ">
   <div class="v-top">
     <div class="v-title" id="vTitle"></div>
-    <button type="button" class="v-close" id="vClose">✕ とじる</button>
   </div>
   <div class="v-stage" id="vStage">
     <div class="v-track" id="vTrack"></div>
   </div>
   <div class="v-bottom">
-    <button type="button" class="v-nav" id="vPrev" aria-label="まえのページ">◀</button>
-    <div class="v-pos" id="vPos" aria-live="polite"></div>
-    <button type="button" class="v-nav" id="vNext" aria-label="つぎのページ">▶</button>
+    <div class="v-pagination">
+      <button type="button" class="v-nav" id="vPrev" aria-label="まえのページ">◀</button>
+      <div class="v-pos" id="vPos" aria-live="polite"></div>
+      <button type="button" class="v-nav" id="vNext" aria-label="つぎのページ">▶</button>
+    </div>
+    <div class="v-actions" aria-label="よむ画面の操作">
+      <button type="button" id="vZoomOut" aria-label="縮小する">−<span>縮小</span></button>
+      <button type="button" id="vZoomReset" aria-label="全体表示に戻す">100%</button>
+      <button type="button" id="vZoomIn" aria-label="拡大する">＋<span>拡大</span></button>
+      <button type="button" class="v-close-bottom" id="vClose">✕ とじる</button>
+    </div>
   </div>
   <div class="v-hint" id="vHint" hidden>👈 スワイプで ページおくり ・ ピンチで かくだい</div>
 </dialog>
@@ -109,6 +125,6 @@
 <script src="issues.js"></script>
 <!-- 日誌の最終更新日を見て「新しい記事あり」の赤い点を出すため、ここでも読みます -->
 <script src="diary.js"></script>
-<script src="assets/pian.js"></script>
+<script src="assets/pian.js?v=mobile-1"></script>
 </body>
 </html>

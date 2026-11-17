@@ -49,12 +49,15 @@
 
   /* <dialog> が無い古い環境でも開閉だけは動くように */
   function openModal(d) {
+    lockScroll(true);
     if (d.showModal) { try { d.showModal(); return; } catch (e) {} }
     d.setAttribute("open", "");
   }
   function closeModal(d) {
     if (d.close) { try { d.close(); return; } catch (e) {} }
     d.removeAttribute("open");
+    if (d === viewer) cleanupViewer();
+    else if (!viewer.open) lockScroll(false);
   }
 
   /* ══════════ データ参照 ══════════ */
@@ -257,6 +260,131 @@
 
   var current = null;
 
+  /* 端末内だけのしおり。ページ順が変わっても画像の識別子で復元する。 */
+  var bookmarkKey = "pianBookmark:" + brandKey;
+  function readBookmark() {
+    try {
+      var mark = JSON.parse(localStorage.getItem(bookmarkKey));
+      if (!mark || typeof mark.issue !== "string" || typeof mark.src !== "string") return null;
+      var issue = findIssue(mark.issue), pages = orderedPages(issue);
+      var index = pages.findIndex(function (p) { return p.src === mark.src; });
+      return index < 0 ? null : { issue: issue, page: pages[index], index: index };
+    } catch (e) { return null; }
+  }
+  function renderBookmark() {
+    var mark = readBookmark(), card = $("resumeCard");
+    card.hidden = !mark;
+    if (!mark) return;
+    var button = $("resumeRead");
+    if (!button) {
+      button = document.createElement("button");
+      button.id = "resumeRead";
+      button.className = "resume-read";
+      button.type = "button";
+      card.appendChild(button);
+    }
+    button.innerHTML = '<span class="bookmark-icon" aria-hidden="true"></span><span class="resume-copy">' +
+      '<strong>つづきから読む <span aria-hidden="true">→</span></strong>' +
+      '<span>' + esc(mark.issue.label) + ' ・ ' + (mark.index + 1) + 'ページ<br>' + esc(mark.page.title) + '</span></span>';
+  }
+  $("resumeCard").addEventListener("click", function (e) {
+    if (!e.target.closest("#resumeRead")) return;
+    var mark = readBookmark();
+    if (!mark) return;
+    if (current !== mark.issue.id) {
+      history.pushState(null, "", "#" + mark.issue.id);
+      apply(mark.issue, { scroll: true });
+    }
+    openViewer(mark.index);
+  });
+
+  var issueSearch = $("issueSearch"), issueYear = $("issueYear");
+  Array.from(new Set(PIAN.issues.map(function (i) { return i.year; }))).forEach(function (year) {
+    var option = document.createElement("option");
+    option.value = year; option.textContent = year + "年"; issueYear.appendChild(option);
+  });
+  function normalizeSearch(value) {
+    return String(value).normalize("NFKC").toLowerCase().replace(/[ァ-ヶ]/g, function (c) {
+      return String.fromCharCode(c.charCodeAt(0) - 0x60);
+    });
+  }
+  function filterIssues() {
+    var query = normalizeSearch(issueSearch.value).trim();
+    query = query.replace(/(\d{4})\s*(?:年|[-/])\s*0?(\d{1,2})(?:月号?)?(?!\d)/g, function (_, year, month) {
+      return year + "年" + Number(month) + "月";
+    });
+    var words = query.split(/\s+/).filter(Boolean), year = issueYear.value;
+    var results = $("sheetResults"), filtering = !!(query || year);
+    sheetGrid.hidden = filtering; results.hidden = !filtering;
+    $("searchClear").disabled = !filtering;
+    if (!filtering) { results.innerHTML = ""; $("searchCount").textContent = ""; return; }
+    if (!query || /^(?:\d{4}年?(?:\d{1,2}月)?|\d{1,2}月号?)(?:号)?$/.test(query)) {
+      var issues = PIAN.issues.filter(function (issue) {
+        return (!year || String(issue.year) === year) && issue.label.indexOf(query) !== -1;
+      });
+      if (issues.length) {
+        $("searchCount").textContent = "検索結果 " + issues.length + "冊";
+        results.innerHTML = issues.map(function (issue) { return cardHTML(issue, current); }).join("");
+        return;
+      }
+    }
+    var matches = [];
+    PIAN.issues.forEach(function (issue) {
+      if (year && String(issue.year) !== year) return;
+      orderedPages(issue).forEach(function (p, index) {
+        var text = normalizeSearch(issue.label + " " + issue.id + " " + p.title + " " + (p.sub || ""));
+        if (words.every(function (word) { return text.indexOf(word) !== -1; })) matches.push({ issue: issue, page: p, index: index });
+      });
+    });
+    $("searchCount").textContent = "検索結果 " + matches.length + "ページ";
+    results.innerHTML = matches.length ? matches.map(function (m) {
+      return '<button type="button" class="search-result" data-result-issue="' + esc(m.issue.id) + '" data-result-page="' + m.index + '">' +
+        '<span class="result-icon" aria-hidden="true">' + ((SEC[m.page.sec] || {}).icon || "📖") + '</span>' +
+        '<span><small>' + esc(m.issue.label) + ' ・ ' + (m.index + 1) + 'ページ</small><strong>' + esc(m.page.title) + '</strong>' +
+        '<span>' + esc(m.page.sub || "") + '</span></span><span aria-hidden="true">→</span></button>';
+    }).join("") : '<div class="search-empty"><span aria-hidden="true">📖</span><strong>見つかりませんでした</strong><p>短いことばでさがすか、<br>発行年を「すべての年」にしてみてください。</p></div>';
+  }
+  issueSearch.addEventListener("input", filterIssues);
+  issueYear.addEventListener("change", filterIssues);
+  $("searchClear").addEventListener("click", function () {
+    issueSearch.value = ""; issueYear.value = ""; filterIssues(); issueSearch.focus();
+  });
+
+  function modalState(kind, index) {
+    return { pianModal: kind, issue: current, page: index || 0 };
+  }
+  var closingWithBack = false;
+  function dismissModal(dialog, kind) {
+    if (!dialog.open || closingWithBack) return;
+    if (history.state && history.state.pianModal === kind) {
+      closingWithBack = true;
+      history.back();
+    } else closeModal(dialog);
+  }
+  function closeSheet() {
+    dismissModal(sheet, "sheet");
+  }
+  $("sheetClose").addEventListener("click", closeSheet);
+  sheet.addEventListener("close", function () { if (!viewer.open) lockScroll(false); });
+  sheet.addEventListener("cancel", function (e) { e.preventDefault(); closeSheet(); });
+  window.addEventListener("popstate", function () {
+    closingWithBack = false;
+    var state = history.state;
+    var id = state && state.issue || idFromHash() || PIAN.issues[0].id;
+    if (viewer.open) {
+      if (id !== current) V.openAt = V.i;
+      closeModal(viewer);
+    }
+    if (sheet.open) closeModal(sheet);
+    if (id !== current) apply(findIssue(id) || PIAN.issues[0]);
+    // close イベントの後に復元し、新しいビューアの画像を消さない。
+    setTimeout(function () {
+      if (state !== history.state && JSON.stringify(state) !== JSON.stringify(history.state)) return;
+      if (state && state.pianModal === "reader") openViewer(state.page, true);
+      if (state && state.pianModal === "sheet") { filterIssues(); openModal(sheet); }
+    }, 0);
+  });
+
   /* 号の切り替えは画面をまるごと入れ替えるので、見ていない人には何も起きていないように
      見える（title を変えても読み上げられない）。切り替わったことをここから伝える。 */
   var liveStatus = document.createElement("p");
@@ -271,13 +399,13 @@
        「読んでいた場所へ戻す」だけは効かないようにしてから閉じる。 */
     if (viewer && viewer.open) {
       V.openAt = V.i;
-      closeViewer();
-      if (!viewer.close) cleanupViewer();
+      closeModal(viewer);
     }
     current = issue.id;
     root.innerHTML = issueHTML(issue);
     archRoot.innerHTML = archiveHTML(issue.id);
     sheetGrid.innerHTML = archiveHTML(issue.id);
+    filterIssues();
     dockHTML(issue);
     document.title = "月刊ぴあん " + issue.label + "｜" + brand.name;
     if (opts && opts.scroll) {
@@ -361,17 +489,37 @@
 
   /* ══════════ 号えらびシート ══════════ */
 
-  dockIssue.addEventListener("click", function () { openModal(sheet); });
+  dockIssue.addEventListener("click", function () {
+    history.pushState(modalState("sheet"), "");
+    filterIssues(); openModal(sheet);
+  });
   sheet.addEventListener("click", function (e) {
     /* 中身の外（backdrop側）をタップしたら閉じる */
-    if (e.target === sheet) closeModal(sheet);
+    if (e.target === sheet) closeSheet();
+    var result = e.target.closest("[data-result-page]");
+    if (result) {
+      var selected = findIssue(result.getAttribute("data-result-issue"));
+      var index = Number(result.getAttribute("data-result-page"));
+      closeModal(sheet);
+      if (current === selected.id) {
+        history.replaceState(modalState("reader", index), "");
+        openViewer(index, true);
+      } else {
+        history.replaceState(null, "", "#" + selected.id);
+        apply(selected, { scroll: true });
+        openViewer(index);
+      }
+      return;
+    }
     var card = e.target.closest ? e.target.closest(".arch-card") : null;
     if (card) {
       /* 他事業所へ渡すカードは、そのまま href に任せる */
-      if (card.getAttribute("data-jump")) { closeModal(sheet); return; }
+      if (card.getAttribute("data-jump")) { history.replaceState(null, "", "#" + current); closeModal(sheet); return; }
       e.preventDefault();
+      if (card.getAttribute("data-issue") === current) { closeSheet(); return; }
       closeModal(sheet);
-      location.hash = card.getAttribute("data-issue");
+      history.replaceState(null, "", "#" + card.getAttribute("data-issue"));
+      show(card.getAttribute("data-issue"), { scroll: true });
     }
   });
   /* グリップの下スワイプで閉じる */
@@ -379,7 +527,7 @@
     var startY = null;
     var body = sheet.querySelector(".sheet-body");
     sheet.addEventListener("pointerdown", function (e) {
-      if (body.scrollTop <= 0) startY = e.clientY;
+      if (e.target.classList.contains("sheet-grip") && body.scrollTop <= 0) startY = e.clientY;
       else startY = null;
     });
     sheet.addEventListener("pointermove", function (e) {
@@ -391,7 +539,7 @@
       if (startY == null) return;
       var dy = e.clientY - startY;
       sheet.style.translate = "";
-      if (dy > 90) closeModal(sheet);
+      if (dy > 90 && e.type !== "pointercancel") closeSheet();
       startY = null;
     }
     sheet.addEventListener("pointerup", end);
@@ -455,6 +603,9 @@
     if (!img) return;
     img.style.transition = anim && !prefersStill() ? "transform .28s cubic-bezier(.2,.8,.25,1)" : "none";
     img.style.transform = "translate(" + V.tx + "px," + V.ty + "px) scale(" + V.s + ")";
+    $("vZoomReset").textContent = Math.round(V.s * 100) + "%";
+    $("vZoomOut").setAttribute("aria-disabled", V.s <= 1 ? "true" : "false");
+    $("vZoomIn").setAttribute("aria-disabled", V.s >= ZOOM_MAX ? "true" : "false");
   }
 
   function resetZoom() {
@@ -554,9 +705,13 @@
     viewer.style.opacity = "";
     loadNear();
     updateChrome();
+    if (history.state && history.state.pianModal === "reader" && history.state.page !== V.i) {
+      history.replaceState(modalState("reader", V.i), "");
+    }
+    try { localStorage.setItem(bookmarkKey, JSON.stringify({ issue: current, src: V.list[V.i].src })); } catch (e) {}
   }
 
-  function openViewer(idx) {
+  function openViewer(idx, fromHistory) {
     var issue = findIssue(current);
     var c = content(issue);
     if (!c) return;
@@ -565,10 +720,9 @@
     if (!V.list.length) return;
     V.label = issue.label + "　" + brand.name;
     V.openAt = clamp(idx || 0, 0, V.list.length - 1);
+    if (!fromHistory) history.pushState(modalState("reader", V.openAt), "");
     buildCells();
-    viewer.classList.remove("ui-hide");
     openModal(viewer);
-    lockScroll(true);
     V.i = V.openAt;
     /* getBoundingClientRect が同期レイアウトを起こすので、開いた直後でも寸法は取れる
        （rAF はバックグラウンドで止まることがあるため使わない） */
@@ -595,12 +749,15 @@
     document.documentElement.style.overflow = on ? "hidden" : "";
   }
 
-  function closeViewer() { closeModal(viewer); }
+  function closeViewer() {
+    dismissModal(viewer, "reader");
+  }
 
   viewer.addEventListener("close", cleanupViewer);
   function cleanupViewer() {
-    lockScroll(false);
+    if (!sheet.open) lockScroll(false);
     stopInertia();
+    lastTap = 0; lastTapXY = null;
     /* 指の状態を持ち越さない。残っていると次に開いたとき最初のタッチが効かない */
     ptrs.clear();
     G = null;
@@ -619,18 +776,28 @@
     }
     vTrack.innerHTML = "";
     V.cells = [];
+    renderBookmark();
   }
-  vClose.addEventListener("click", function () {
-    closeViewer();
-    if (!viewer.close) cleanupViewer(); /* dialog 非対応環境 */
-  });
+  vClose.addEventListener("click", closeViewer);
   vPrev.addEventListener("click", function () { goTo(V.i - 1, true); });
   vNext.addEventListener("click", function () { goTo(V.i + 1, true); });
+  function buttonZoom(multiplier) {
+    stopInertia();
+    var next = clamp(V.s * multiplier, 1, ZOOM_MAX);
+    if (next === V.s) return;
+    var r = stageRect(), ratio = next / V.s;
+    V.tx = r.width / 2 - (r.width / 2 - V.tx) * ratio;
+    V.ty = r.height / 2 - (r.height / 2 - V.ty) * ratio;
+    V.s = next; clampPan(0); applyZoom(true);
+  }
+  $("vZoomIn").addEventListener("click", function () { buttonZoom(1.5); });
+  $("vZoomOut").addEventListener("click", function () { buttonZoom(1 / 1.5); });
+  $("vZoomReset").addEventListener("click", function () { stopInertia(); resetZoom(); applyZoom(true); });
   viewer.addEventListener("keydown", function (e) {
     if (e.key === "ArrowLeft") { e.preventDefault(); goTo(V.i - 1, true); }
     if (e.key === "ArrowRight") { e.preventDefault(); goTo(V.i + 1, true); }
   });
-  viewer.addEventListener("cancel", function () { /* Esc/もどる → close イベントで後始末 */ });
+  viewer.addEventListener("cancel", function (e) { e.preventDefault(); closeViewer(); });
   window.addEventListener("resize", function () {
     if (!viewer.open) return;
     for (var j = 0; j < V.cells.length; j++) layoutCell(j);
@@ -639,7 +806,7 @@
 
   /* ---- ジェスチャ（1本指=ページ送り/パン、2本指=ピンチ、下スワイプ=とじる） ---- */
 
-  var ptrs = new Map(), G = null, lastTap = 0, lastTapXY = null, tapTimer = null, inertia = null;
+  var ptrs = new Map(), G = null, lastTap = 0, lastTapXY = null, inertia = null;
 
   function pxy(e) {
     var r = stageRect();
@@ -790,26 +957,20 @@
         /* 先に戻さないと、インラインの opacity が .viewer:not([open]){opacity:0} に
            勝って、閉じるあいだ薄いまま居座る */
         viewer.style.opacity = "";
-        closeViewer(); if (!viewer.close) cleanupViewer();
+        closeViewer();
       }
       else { viewer.style.opacity = ""; setTrack(0, 0, true); }
       return;
     }
-    /* タップ（シングル=バー表示切替 / ダブル=拡大） */
+    /* ダブルタップで拡大 */
     var dur = performance.now() - g.t0;
     if (g.moved < 10 && dur < 800) {
       var now = performance.now();
       if (now - lastTap < 320 && lastTapXY && Math.hypot(g.x0 - lastTapXY.x, g.y0 - lastTapXY.y) < 32) {
         lastTap = 0; lastTapXY = null;
-        if (tapTimer) { clearTimeout(tapTimer); tapTimer = null; }
         dblTap(g.x0, g.y0);
       } else {
         lastTap = now; lastTapXY = { x: g.x0, y: g.y0 };
-        if (tapTimer) clearTimeout(tapTimer);
-        tapTimer = setTimeout(function () {
-          tapTimer = null;
-          if (lastTap) { lastTap = 0; viewer.classList.toggle("ui-hide"); }
-        }, 330);
       }
     }
   }
@@ -916,6 +1077,9 @@
 
   dock.hidden = false;
   show(idFromHash() || PIAN.issues[0].id, { force: true });
+  renderBookmark();
+  if (history.state && history.state.pianModal === "reader") openViewer(history.state.page, true);
+  if (history.state && history.state.pianModal === "sheet") openModal(sheet);
   onScroll();
 
   if ("serviceWorker" in navigator) {

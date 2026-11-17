@@ -659,10 +659,6 @@ a{color:var(--brand-ink);}
   font-family:var(--font-head); font-weight:700; font-size:18px;
   letter-spacing:.08em; color:var(--ink);
 }
-.sheet-lead{
-  margin:0 0 14px; text-align:center;
-  font-size:14px; color:var(--ink-2);
-}
 
 /* ══════════ ページビューア（フルスクリーン） ══════════ */
 /* ここだけは暗い下地。デザインシステムのダークテーマ規定に合わせ、
@@ -697,13 +693,6 @@ a{color:var(--brand-ink);}
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .v-title .v-issue{font-size:12px; display:block; font-family:var(--font-body); letter-spacing:.08em;}
-.v-close{
-  flex:0 0 auto; min-width:48px; min-height:44px; padding:0 14px; cursor:pointer;
-  font-family:var(--font-head); font-weight:700; font-size:14px;
-  color:var(--on-maste); background:var(--m-yellow);
-  border:0; border-radius:var(--radius-btn);
-}
-.v-close:active{filter:brightness(1.08);}
 
 .v-stage{
   position:absolute; inset:0;
@@ -756,11 +745,6 @@ a{color:var(--brand-ink);}
   display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-/* 没入モード（単タップでバーを隠す） */
-/* 隠すときは visibility も落とす。opacity:0 だけだと、見えていないボタンに
-   Tab でフォーカスが入り、読み上げにも「✕ とじる ボタン」が残る */
-.viewer.ui-hide .v-top{opacity:0; visibility:hidden; transform:translateY(-12px); pointer-events:none;}
-.viewer.ui-hide .v-bottom{opacity:0; visibility:hidden; transform:translateY(12px); pointer-events:none;}
 
 .v-hint{
   position:absolute; left:50%; bottom:calc(96px + env(safe-area-inset-bottom,0px));
@@ -817,11 +801,83 @@ a{color:var(--brand-ink);}
   .arch-card,.dock-tab,.tools button,.tools .tool-link{border:2px solid #000000;}
 }
 
+/* ══════════ 片手でよむ・本だな・しおり ══════════ */
+.resume-read{
+  display:flex; align-items:center; gap:17px; width:100%; margin:24px 0 0;
+  padding:18px 20px; text-align:left; color:var(--ink); background:var(--card);
+  border:1px solid var(--brand); border-radius:18px; cursor:pointer;
+  box-shadow:0 5px 0 var(--brand-soft); font:inherit;
+}
+.bookmark-icon{
+  display:grid; place-items:center; align-self:stretch; flex:0 0 42px;
+  background:var(--brand); color:var(--brand-ink);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% 85%,0 100%); padding-bottom:12px;
+}
+.resume-copy{min-width:0; display:grid; gap:3px;}
+.resume-copy strong{font-family:var(--font-head); font-size:21px; color:var(--brand-ink);}
+.resume-copy strong span{display:inline-block; margin-left:12px;}
+.resume-copy>span{font-size:13px; line-height:1.65; overflow-wrap:anywhere;}
+.sheet{max-height:85vh; max-height:85dvh; border-top-color:var(--brand); overflow:hidden;}
+.sheet-body{padding-top:8px; max-height:calc(85vh - 3px); max-height:calc(85dvh - 3px);}
+.sheet-grid[hidden]{display:none;}
+.sheet-heading{display:flex; align-items:center; justify-content:space-between; gap:10px; margin:0 0 18px;}
+.sheet-heading h2{text-align:left; font-size:21px; letter-spacing:.02em; line-height:1.5;}
+.shelf-kicker{margin:0 0 3px; font-family:var(--font-accent); font-size:14px; color:var(--brand-ink);}
+.sheet-close{flex:none; min-height:44px; padding:0 12px; border:1px solid var(--line); border-radius:12px; background:var(--card); color:var(--ink); font:inherit; font-size:13px; cursor:pointer;}
+.search-tools{padding:16px; margin-bottom:18px; background:var(--brand-soft); border-radius:16px;}
+.search-tools>label{display:block; margin-bottom:7px; font-size:13px; font-weight:700; color:var(--brand-ink);}
+.search-row{display:flex; align-items:center; gap:8px;}
+.search-row input{min-width:0; width:100%; min-height:48px; padding:10px 12px; border:1px solid var(--brand); border-radius:10px; font:inherit; font-size:16px; background:var(--card); color:var(--ink);}
+.search-row button{flex:none; min-height:44px; padding:0 8px; border:0; background:transparent; color:var(--brand-ink); text-decoration:underline; text-underline-offset:4px; font:inherit; font-size:12px; cursor:pointer;}
+.search-row button:disabled{opacity:.45; cursor:default;}
+.search-meta{display:flex; align-items:center; flex-wrap:wrap; gap:8px; margin-top:10px; font-size:12px; color:var(--brand-ink);}
+.search-meta select{min-height:44px; padding:5px 26px 5px 10px; border:1px solid var(--brand); border-radius:9px; background:var(--card); color:var(--ink); font:inherit; font-size:16px;}
+#searchCount{flex:1 1 130px; text-align:right;}
+.search-result{display:flex; gap:12px; align-items:center; width:100%; padding:16px 10px; border:0; border-bottom:1px dashed var(--line); background:transparent; color:var(--ink); font:inherit; text-align:left; cursor:pointer;}
+.result-icon{flex:none; width:38px; height:42px; display:grid; place-items:center; border-radius:10px; background:var(--brand-soft); font-size:21px;}
+.search-result>span:nth-child(2){flex:1; min-width:0; display:grid; gap:3px;}
+.search-result small{font-size:12px; color:var(--brand-ink);}
+.search-result strong{font-family:var(--font-head); font-size:17px; line-height:1.5; overflow-wrap:anywhere;}
+.search-result>span:nth-child(2)>span{font-size:12px; color:var(--ink-2);}
+.search-result>span:last-child{color:var(--brand-ink);}
+.search-empty{text-align:center; padding:24px 8px;}
+.search-empty>span{display:block; font-size:34px;}
+.search-empty strong{display:block; font-family:var(--font-head);}
+.search-empty p{font-size:14px; color:var(--ink-2);}
+.search-result:hover,.resume-read:hover{background:var(--brand-soft);}
+.sheet-grip{touch-action:none;}
+.v-top{position:relative; flex:none; background:#2A2520; padding-bottom:8px; padding-inline:calc(14px + env(safe-area-inset-left,0px)) calc(14px + env(safe-area-inset-right,0px));}
+.v-stage{position:relative; inset:auto; flex:1; min-height:0;}
+.v-bottom{position:relative; flex:none; flex-direction:column; gap:9px; background:#2A2520; padding-top:8px; padding-inline:calc(12px + env(safe-area-inset-left,0px)) calc(12px + env(safe-area-inset-right,0px));}
+.v-pagination{display:flex; align-items:center; justify-content:space-between; gap:14px; width:100%; max-width:520px;}
+.v-actions{display:flex; gap:6px; width:100%; max-width:520px;}
+.v-actions button{display:flex; justify-content:center; align-items:center; gap:5px; min-width:44px; min-height:46px; padding:0 8px; border:1px solid #746b62; border-radius:12px; background:#3d352e; color:#fffaf4; font:inherit; font-size:17px; cursor:pointer; flex:1;}
+.v-actions button span{font-size:12px;}
+.v-actions #vZoomReset{font-size:13px; font-variant-numeric:tabular-nums;}
+.v-actions button[aria-disabled="true"]{color:#b4aba3;}
+.v-actions .v-close-bottom{flex:1.4; background:var(--m-yellow); color:var(--on-maste); border-color:transparent; font-family:var(--font-head); font-size:14px; font-weight:700;}
+.v-hint{bottom:calc(145px + env(safe-area-inset-bottom,0px)); max-width:calc(100% - 24px); white-space:normal; text-align:center; font-size:12px;}
+.viewer button:focus-visible{outline:3px solid var(--m-yellow); outline-offset:3px;}
+button,a,input,select{touch-action:manipulation;}
+@media(max-width:359px){
+  .sheet-heading h2{font-size:18px;}
+  .search-tools{padding:12px;}
+  .v-actions button{padding:0 5px;}
+  .resume-read{padding:15px; gap:12px;}
+}
+@media(max-height:480px) and (orientation:landscape){
+  .v-bottom{flex-direction:row; gap:16px; padding-top:5px;}
+  .v-actions{flex:1.3;}
+  .v-pagination{flex:1;}
+  .v-pos .v-pt{display:none;}
+  .v-top{padding-top:4px; padding-bottom:4px;}
+}
+
 /* ══════════ 印刷 ══════════ */
 @media print{
   body{background:#fff; padding-bottom:0;}
   body::before,.site,.progress,.dock,.sheet,.viewer,.read-start,
-  .archive,.tools,.totop,.skip,.page-hint{display:none !important;}
+  .archive,.tools,.totop,.skip,.page-hint,#resumeCard{display:none !important;}
   /* 画面での操作説明は紙の上では意味を持たない */
   .foot small{display:none !important;}
   .wrap{max-width:none; padding:0;}

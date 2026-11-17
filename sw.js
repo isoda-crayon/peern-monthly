@@ -84,7 +84,7 @@ self.addEventListener("fetch", function (e) {
   } else {
     // それ以外: ネットワーク優先、落ちたらキャッシュ（オフライン用）
     e.respondWith(
-      fetch(req)
+      fetch(req, { cache: "no-cache" })
         .then(function (res) {
           if (res && res.ok) store(req, res);
           return res;

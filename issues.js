@@ -25,6 +25,42 @@ window.PIAN = {
   },
   issues: [
     {
+      id: "2026-12", year: 2026, month: 12,
+      label: "2026年12月号", short: "12月号",
+      brands: {
+        atelier: {
+          catch: "メリー クリスマス！",
+          note: "12月30日〜1月1日はお休みです。",
+          thumb: {"src": "images/2026-12/atelier/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-12/atelier/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年12月号"},
+            {"src": "images/2026-12/atelier/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "音速飯店", "sub": "きょうかかだい ①〜⑤週目"},
+            {"src": "images/2026-12/atelier/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "ぽかぽかアイテムでホッとタイム", "sub": "めいそうかだい ①〜⑤週目"},
+            {"src": "images/2026-12/atelier/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "イラスト（クリスマス）・カレンダー（ひつじ）", "sub": "メインかだい ①〜②週目"},
+            {"src": "images/2026-12/atelier/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "紙飛行機バトル", "sub": "メインかだい ③週目"},
+            {"src": "images/2026-12/atelier/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "アートダイアローグ（ねこ）", "sub": "メインかだい ④週目"},
+            {"src": "images/2026-12/atelier/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "スティッキー", "sub": "メインかだい ⑤週目"},
+            {"src": "images/2026-12/atelier/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "12月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        },
+        nijiiro: {
+          catch: "メリー クリスマス！",
+          note: "12月30日〜1月1日はお休みです。",
+          thumb: {"src": "images/2026-12/nijiiro/thumb.webp", "w": 240, "h": 240},
+          pages: [
+            {"src": "images/2026-12/nijiiro/p1.webp", "w": 1600, "h": 2262, "sec": "cover", "title": "表紙", "sub": "2026年12月号"},
+            {"src": "images/2026-12/nijiiro/p2.webp", "w": 1600, "h": 2262, "sec": "subject", "title": "ウボンゴ", "sub": "きょうかかだい ①〜⑤週目"},
+            {"src": "images/2026-12/nijiiro/p3.webp", "w": 1600, "h": 2262, "sec": "meditation", "title": "かおりでホッとタイム", "sub": "めいそうかだい ①〜⑤週目"},
+            {"src": "images/2026-12/nijiiro/p4.webp", "w": 1600, "h": 2262, "sec": "main", "title": "おめめをきたえよう選手権", "sub": "メインかだい ①週目"},
+            {"src": "images/2026-12/nijiiro/p5.webp", "w": 1600, "h": 2262, "sec": "main", "title": "キャプテン・リノ", "sub": "メインかだい ②週目"},
+            {"src": "images/2026-12/nijiiro/p6.webp", "w": 1600, "h": 2262, "sec": "main", "title": "イラスト（クリスマス）・カレンダー（ひつじ）", "sub": "メインかだい ③〜④週目"},
+            {"src": "images/2026-12/nijiiro/p7.webp", "w": 1600, "h": 2262, "sec": "main", "title": "ストライクASIA", "sub": "メインかだい ⑤週目"},
+            {"src": "images/2026-12/nijiiro/p8.webp", "w": 1600, "h": 2262, "sec": "schedule", "title": "12月のメイン課題スケジュール", "sub": "1か月のよてい／ぼうけんマップ"}
+          ]
+        }
+      }
+    },
+    {
       id: "2026-11", year: 2026, month: 11,
       label: "2026年11月号", short: "11月号",
       brands: {

@@ -1,4 +1,4 @@
-/* 月刊ぴあん — 号の表示・ドック・号えらびシート・ページビューア
+/* 月刊ぴあん — 号の表示・黒板のバックナンバー・ドック・ページビューア
  *
  * データは issues.js（window.PIAN）。
  * このファイルは表示だけを担当するので、号を足すときに触る必要はありません。
@@ -36,6 +36,8 @@
   var dock = $("dock"), dockIssue = $("dockIssue"), dockTabs = $("dockTabs");
   var sheet = $("issueSheet"), sheetGrid = $("sheetGrid");
   var toTop = $("toTop"), progress = $("readProgress");
+  var board = $("issueBoard"), boardList = $("boardList");
+  var desktopLayout = window.matchMedia("screen and (min-width: 960px)");
 
   function esc(s) {
     return String(s == null ? "" : s)
@@ -120,7 +122,8 @@
           (p.sub ? '<span class="wk">' + esc(p.sub) + "</span>" : "") +
           '<span class="ttl">' + esc(p.title) + "</span>" +
           /* 見た目の誘導文。button の aria-label と同じ内容が二重に読まれるので隠す */
-          '<span class="page-hint" aria-hidden="true">📖 タップでよむ</span>' +
+          '<span class="page-hint" aria-hidden="true">📖 <span class="touch-copy">タップでよむ</span>' +
+            '<span class="desktop-copy">拡大してよむ</span></span>' +
         "</figcaption>" +
         '<button type="button" class="page-view' + (cropped ? " is-crop" : "") + '" ' +
                 'data-open="' + idx + '" aria-label="' + esc(alt) + ' をよむ"' + style + ">" +
@@ -149,13 +152,15 @@
 
     var html = '<article class="issue">';
 
-    html += '<header class="hero">' +
+    html += '<header class="hero' + (cover ? " with-cover" : "") + '">' +
+      '<div class="hero-intro">' +
       '<p class="hero-kicker">' + esc(brand.name) + "</p>" +
       '<h1 class="hero-title" tabindex="-1" aria-label="' + esc(issue.label) + '">' +
         "<span>" + issue.year + "年</span>" +
         '<span class="num" aria-hidden="true">' + issue.month + "<small>月号</small></span>" +
       "</h1>";
     if (c["catch"]) html += '<p class="hero-catch">' + esc(c["catch"]) + "</p>";
+    html += "</div>";
     if (cover) {
       html += '<figure class="cover">' +
         '<button type="button" data-open="' + ord.indexOf(cover) + '" ' +
@@ -164,13 +169,20 @@
              'decoding="async" fetchpriority="high" alt="' + esc(issue.label) + "　" + esc(brand.name) + 'の表紙">' +
         "</button></figure>";
     }
-    html += '<button type="button" class="read-start" data-open="0">📖 はじめから よむ</button>';
+    html += '<div class="hero-actions"><button type="button" class="read-start" data-open="0">📖 はじめから よむ</button>';
     if (c.note) {
       html += '<p class="hero-note"><span class="ico">📌</span><span>' + esc(c.note) + "</span></p>";
     }
-    html += "</header>";
+    html += "</div></header>";
 
     var live = SEC_ORDER.filter(function (s) { return pagesOf(issue, s).length; });
+    if (live.length) html += '<nav class="contents" aria-label="この号のもくじ">' +
+      '<h2>この号のもくじ</h2><ul>' + live.map(function (s) {
+        return '<li><button type="button" class="contents-link" data-sec="' + s + '">' +
+          '<span class="contents-icon" aria-hidden="true">' + SEC[s].icon + '</span>' +
+          '<span><strong>' + SEC[s].name + '</strong><small>' + pagesOf(issue, s).length + 'ページ</small></span>' +
+          '<span class="contents-arrow" aria-hidden="true">↓</span></button></li>';
+      }).join("") + "</ul></nav>";
     live.forEach(function (s) {
       var list = pagesOf(issue, s);
       html += '<section class="sec" data-sec="' + s + '" id="sec-' + s + '">' +
@@ -244,6 +256,50 @@
       html += cardHTML(i, currentId);
     });
     return html;
+  }
+
+  /* 黒板は最初に一度だけ作る。選択が変わっても、開いた年やリンクのフォーカスを保つ。 */
+  function renderIssueBoard() {
+    var years = Array.from(new Set(PIAN.issues.map(function (issue) { return issue.year; })));
+    boardList.innerHTML = years.map(function (year) {
+      var issues = PIAN.issues.filter(function (issue) { return issue.year === year; });
+      return '<details class="board-year" data-year="' + year + '">' +
+        '<summary><strong>' + year + '年</strong><span>' + issues.length + '冊</span></summary>' +
+        '<ul class="board-months">' + issues.map(function (issue) {
+          var thumb = thumbOf(issue);
+          var alt = content(issue) ? null : otherBrandOf(issue);
+          var tag = alt ? alt.name.replace(/くれよん$/, "版") : issue === PIAN.issues[0] ? "最新号" : "";
+          var href = (alt ? esc(alt.href) : "") + "#" + issue.id;
+          return '<li><a class="board-month" href="' + href + '" data-board-issue="' + issue.id + '"' +
+            (alt ? ' data-jump="1"' : "") + '>' +
+            '<span class="board-cover" aria-hidden="true">📖' + (thumb
+              ? '<img src="' + esc(thumb.src) + '" width="' + thumb.w + '" height="' + thumb.h +
+                '" loading="lazy" decoding="async" alt="">'
+              : '') + '</span><span><strong><span class="sr-only">' + year + "年</span>" +
+            issue.month + '月号</strong>' + (tag ? '<small>' + esc(tag) + '</small>' : "") + '</span></a></li>';
+        }).join("") + "</ul></details>";
+    }).join("");
+    board.hidden = false;
+    $("main").classList.add("has-issue-board");
+  }
+
+  function revealBoardIssue(link) {
+    if (!link || !desktopLayout.matches) return;
+    /* scrollIntoView は右の誌面も動かすため、黒板の中だけを動かす。 */
+    var item = link.getBoundingClientRect();
+    var list = boardList.getBoundingClientRect();
+    if (item.top < list.top + 5) boardList.scrollTop += item.top - list.top - 5;
+    else if (item.bottom > list.bottom - 5) boardList.scrollTop += item.bottom - list.bottom + 5;
+  }
+
+  function setBoardIssue(issue) {
+    var previous = boardList.querySelector('[aria-current="true"]');
+    if (previous) previous.removeAttribute("aria-current");
+    var selected = boardList.querySelector('[data-board-issue="' + issue.id + '"]');
+    if (!selected) return;
+    selected.closest("details").open = true;
+    selected.setAttribute("aria-current", "true");
+    revealBoardIssue(selected);
   }
 
   function dockHTML(issue) {
@@ -403,17 +459,20 @@
     }
     current = issue.id;
     root.innerHTML = issueHTML(issue);
+    if (opts && opts.scroll) window.scrollTo({ top: 0, behavior: "instant" });
+    setBoardIssue(issue);
     archRoot.innerHTML = archiveHTML(issue.id);
     sheetGrid.innerHTML = archiveHTML(issue.id);
     filterIssues();
     dockHTML(issue);
     document.title = "月刊ぴあん " + issue.label + "｜" + brand.name;
     if (opts && opts.scroll) {
-      window.scrollTo({ top: 0, behavior: "auto" });
       /* 自分で選んで切り替えたときだけ。起動時に動かすとページの頭を飛ばしてしまう */
       liveStatus.textContent = issue.label + "を ひらきました";
-      var h = root.querySelector(".hero-title");
-      if (h) h.focus({ preventScroll: true });
+      if (!opts.keepFocus) {
+        var h = root.querySelector(".hero-title") || $("reading");
+        h.focus({ preventScroll: true });
+      }
     }
     curTab = null;
     updateSpy();
@@ -425,7 +484,7 @@
     var run = function () { apply(issue, opts); };
     /* View Transitions API があれば、号の切り替えをふわっと繋ぐ
        （バックグラウンド等で遷移が中断されても表示自体は run() で完了している） */
-    if (document.startViewTransition && !prefersStill() && current) {
+    if (document.startViewTransition && !prefersStill() && current && !desktopLayout.matches) {
       var t = document.startViewTransition(run);
       if (t) {
         if (t.ready && t.ready.catch) t.ready.catch(function () {});
@@ -476,22 +535,42 @@
     setTab(cur);
   }
 
-  dockTabs.addEventListener("click", function (e) {
-    var b = e.target.closest(".dock-tab");
-    if (!b) return;
-    var el = $("sec-" + b.getAttribute("data-sec"));
+  function jumpToSection(sec) {
+    var el = $("sec-" + sec);
     if (el) {
       el.scrollIntoView({ behavior: prefersStill() ? "auto" : "smooth", block: "start" });
       var head = el.querySelector(".sec-head");
       if (head) head.focus({ preventScroll: true });
     }
+  }
+  dockTabs.addEventListener("click", function (e) {
+    var b = e.target.closest(".dock-tab");
+    if (b) jumpToSection(b.getAttribute("data-sec"));
   });
 
   /* ══════════ 号えらびシート ══════════ */
 
-  dockIssue.addEventListener("click", function () {
+  function openIssueSheet() {
     history.pushState(modalState("sheet"), "");
     filterIssues(); openModal(sheet);
+  }
+  dockIssue.addEventListener("click", openIssueSheet);
+  $("boardSearch").addEventListener("click", openIssueSheet);
+  boardList.addEventListener("load", function (e) {
+    e.target.setAttribute("data-loaded", "");
+  }, true);
+  boardList.addEventListener("click", function (e) {
+    var link = e.target.closest("[data-board-issue]");
+    if (!link || link.hasAttribute("data-jump") || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    link.focus({ preventScroll: true });
+    var id = link.getAttribute("data-board-issue");
+    if (id === current) {
+      window.scrollTo({ top: 0, behavior: prefersStill() ? "instant" : "smooth" });
+      return;
+    }
+    history.pushState(null, "", link.getAttribute("href"));
+    show(id, { scroll: true, keepFocus: true });
   });
   sheet.addEventListener("click", function (e) {
     /* 中身の外（backdrop側）をタップしたら閉じる */
@@ -991,6 +1070,8 @@
   root.addEventListener("click", function (e) {
     var b = e.target.closest ? e.target.closest("[data-open]") : null;
     if (b) openViewer(parseInt(b.getAttribute("data-open"), 10) || 0);
+    var section = e.target.closest(".contents-link");
+    if (section) jumpToSection(section.getAttribute("data-sec"));
   });
 
   /* ══════════ 読みすすみバー・現在地・うえへ ══════════ */
@@ -1004,6 +1085,9 @@
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   window.addEventListener("resize", onScroll, { passive: true });
+  if (desktopLayout.addEventListener) desktopLayout.addEventListener("change", function () {
+    revealBoardIssue(boardList.querySelector('[aria-current="true"]'));
+  });
 
   if (toTop) {
     toTop.addEventListener("click", function () {
@@ -1075,6 +1159,13 @@
 
   /* ══════════ 起動 ══════════ */
 
+  document.querySelector(".skip").addEventListener("click", function (e) {
+    e.preventDefault();
+    var reading = $("reading");
+    reading.focus({ preventScroll: true });
+    reading.scrollIntoView({ block: "start", behavior: "instant" });
+  });
+  renderIssueBoard();
   dock.hidden = false;
   show(idFromHash() || PIAN.issues[0].id, { force: true });
   renderBookmark();

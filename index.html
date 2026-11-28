@@ -21,11 +21,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Kosugi+Maru&family=Noto+Sans+JP:wght@500;700&family=Yomogi&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="assets/pian.css?v=mobile-1" />
+<link rel="stylesheet" href="assets/pian.css?v=reading-1" />
 </head>
 <body data-brand="atelier">
 
-<a class="skip" href="#main">本文へすすむ</a>
+<a class="skip" href="#reading">本文へすすむ</a>
 <div class="progress" id="readProgress" aria-hidden="true"></div>
 
 <header class="site">
@@ -42,37 +42,47 @@
 </header>
 
 <main id="main" class="wrap">
-
-  <div id="resumeCard" hidden></div>
-  <div id="issueRoot"></div>
-
-  <noscript>
-    <p class="hero-note" style="margin:28px auto;">
-      <span class="ico">⚠️</span>
-      <span>このページを見るには、ブラウザのJavaScriptを有効にしてください。</span>
-    </p>
-  </noscript>
-
-  <section class="archive" id="archive" aria-labelledby="archTitle">
-    <div class="archive-head">
-      <span class="ico" aria-hidden="true">📚</span>
-      <h2 id="archTitle">バックナンバー</h2>
+  <nav class="issue-board" id="issueBoard" aria-labelledby="boardTitle" hidden>
+    <div class="board-heading">
+      <h2 id="boardTitle"><span aria-hidden="true">📚</span> バックナンバー</h2>
+      <button type="button" id="boardSearch" aria-haspopup="dialog"><span aria-hidden="true">⌕</span> 課題・号をさがす</button>
     </div>
-    <p class="archive-lead">これまでの月刊ぴあんです。見たい月をえらんでください。</p>
-    <div class="arch-list" id="archList"></div>
-  </section>
+    <div class="board-scroll" id="boardList"></div>
+    <div class="board-ledge" aria-hidden="true"></div>
+  </nav>
 
-  <div class="tools">
-    <button type="button" id="printBtn">🖨 いんさつ・PDFでほぞん</button>
-    <a class="tool-link" href="diary.html" id="diaryLink">📔 この ページの あゆみ</a>
+  <div class="reading" id="reading" tabindex="-1">
+    <div id="resumeCard" hidden></div>
+    <div id="issueRoot"></div>
+
+    <noscript>
+      <p class="hero-note" style="margin:28px auto;">
+        <span class="ico">⚠️</span>
+        <span>このページを見るには、ブラウザのJavaScriptを有効にしてください。</span>
+      </p>
+    </noscript>
+
+    <section class="archive" id="archive" aria-labelledby="archTitle">
+      <div class="archive-head">
+        <span class="ico" aria-hidden="true">📚</span>
+        <h2 id="archTitle">バックナンバー</h2>
+      </div>
+      <p class="archive-lead">これまでの月刊ぴあんです。見たい月をえらんでください。</p>
+      <div class="arch-list" id="archList"></div>
+    </section>
+
+    <div class="tools">
+      <button type="button" id="printBtn">🖨 いんさつ・PDFでほぞん</button>
+      <a class="tool-link" href="diary.html" id="diaryLink">📔 この ページの あゆみ</a>
+    </div>
   </div>
-
 </main>
 
 <footer class="foot wrap">
   <div class="rainbow" aria-hidden="true"></div>
   月刊ぴあん ｜ あとりえくれよん<br />
-  <small>ページはタップでよむ画面がひらきます ・ ひろげる指で拡大できます</small>
+  <small class="touch-copy">ページはタップでよむ画面がひらきます ・ ひろげる指で拡大できます</small>
+  <small class="desktop-copy">ページをクリックすると、拡大して読めます。</small>
 </footer>
 
 <button class="totop" id="toTop" type="button">↑ うえへ</button>
@@ -125,6 +135,6 @@
 <script src="issues.js"></script>
 <!-- 日誌の最終更新日を見て「新しい記事あり」の赤い点を出すため、ここでも読みます -->
 <script src="diary.js"></script>
-<script src="assets/pian.js?v=mobile-1"></script>
+<script src="assets/pian.js?v=reading-1"></script>
 </body>
 </html>
